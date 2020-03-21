@@ -1,0 +1,11 @@
+<div class="container" style="color: black;background-color: #ffffff !important;">
+    <div class="search-results" infinite-scroll [infiniteScrollDistance]="scrollDistance"
+        [infiniteScrollUpDistance]="scrollUpDistance" [infiniteScrollThrottle]="throttle" (scrolled)="onScrollDown($event)"
+        (scrolledUp)="onUp($event)">
+        <div *ngFor="let article of Card.articles">
+            <app-article-item [article]="article"></app-article-item>
+        </div>
+        <div *ngFor="let _ of Card.placeholders">
+            <app-article-item-placeholders></app-article-item-placeholders>
+    </div>
+</div>

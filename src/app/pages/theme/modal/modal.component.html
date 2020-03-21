@@ -1,0 +1,16 @@
+<div class="{{modalDetails.modalClass}}">
+    <div class="modal-header">
+        <h4 class="modal-title">{{modalDetails.title}}</h4>
+    </div>
+    <div class="modal-body">
+        <p>{{modalDetails.body}}</p>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="modalDetails.confirmButtonVisisble" type="button" class="btn btn-primary"
+            (click)="this.activeModal.close(true)">{{modalDetails.confirmButtonText}}</button>
+        <button *ngIf="modalDetails.yesButtonVisisble" type="button" class="btn btn-primary"
+            (click)="activeModal.close(modalDetails.yesButtonText)">{{modalDetails.yesButtonText}}</button>
+        <button *ngIf="modalDetails.noButtonVisisble" type="button" class="btn btn-danger"
+            (click)="activeModal.close(modalDetails.noButtonText)">{{modalDetails.noButtonText}}</button>
+    </div>
+</div>

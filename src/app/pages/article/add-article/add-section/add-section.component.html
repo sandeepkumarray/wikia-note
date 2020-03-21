@@ -1,0 +1,51 @@
+<!-- <div name="summary" [(ngModel)]="article.summary" #summary="ngModel" [required]="true"
+    [ngxSummernote]="summaryNoteconfig" [ngxSummernoteDisabled]="editorDisabled" (blur)="SummaryOnBlur($event)"
+    (mediaDelete)="onDelete($event)" (summernoteInit)="SummaryInit($event)">
+</div> -->
+<div class="card" style="background-color: #e8e8e8;">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-4 offset-md-8">
+                <a (click)="removeObject()" style="float: right;"  class="text-danger">
+                    <i class="fa fa-trash" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="form-group row">
+            <label class="label col-sm-2 col-form-label" for="input-name">
+                <h5>Section Title</h5>
+            </label>
+            <div class="col-sm-9">
+                <input  class="form-control" [(ngModel)]="section.title" #title="ngModel" id="input-name" name="title"
+                    placeholder="Section Title" autofocus fullWidth fieldSize="large"
+                   [required]="true"
+                    [minlength]="3" [maxlength]="50" [attr.aria-invalid]="title.invalid && title.touched ? true : null">
+                <ng-container *ngIf="title.invalid && title.touched">
+                    <p class="text-danger" *ngIf="title.errors?.required">
+                        Title is required!
+                    </p>
+                    <p class="text-danger" *ngIf="title.errors?.minlength || title.errors?.maxlength">
+                        Title should be at least of 10.
+                    </p>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="label col-sm-2 col-form-label" for="input-description">
+                <h5>Content</h5>
+            </label>
+            <div class="col-sm-9">
+                <div name="description" [(ngModel)]="section.description" #description="ngModel" [required]="true"
+                    [ngxSummernote]="descriptionNoteconfig">
+                </div>
+                <ng-container *ngIf="description.invalid && description.touched">
+                    <p class="text-danger" *ngIf="description.errors?.required">
+                        Content is required!
+                    </p>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

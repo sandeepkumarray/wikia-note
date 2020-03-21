@@ -1,0 +1,42 @@
+[
+    {
+      "id": "1",
+      "category_name": "Technology"
+    },
+    {
+      "id": "2",
+      "category_name": "Design"
+    },
+    {
+      "id": "3",
+      "category_name": "Culture"
+    },
+    {
+      "id": "4",
+      "category_name": "Business"
+    },
+    {
+      "id": "5",
+      "category_name": "Politics"
+    },
+    {
+      "id": "6",
+      "category_name": "Opinion"
+    },
+    {
+      "id": "7",
+      "category_name": "Science"
+    },
+    {
+      "id": "8",
+      "category_name": "Health"
+    },
+    {
+      "id": "9",
+      "category_name": "Style"
+    },
+    {
+      "id": "10",
+      "category_name": "Travel"
+    }
+  ]
