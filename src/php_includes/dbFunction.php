@@ -94,6 +94,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$userid = trim($data->userid);
         $bannerimg = !empty($data->bannerimg) ? "'$data->bannerimg'" : "NULL";
         $sections = $data->sections;
+        $infocard = $data->infocard;
         
         $sql = "SELECT id FROM articles WHERE title = '$title'";
         
@@ -126,11 +127,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 						foreach($sections as $key => $value) {
 							$sql = "INSERT INTO sections (title, content, article_id ) VALUES ";
 							
-							$sql .= "('".$value->title."','" .base64_encode($value->description)."', $article_id)";
+							$sql .= "('".$value->title."','" .($value->description)."', $article_id)";
                             
                             $log->info("Section insert sql = $sql");
 							mysqli_query( $link, $sql );  
-						}                       
+                        }
+                        
+                        if(!empty($infocard)){
+
+                            $sql="DELETE FROM infocard WHERE article_id=$article_id";
+							mysqli_query( $link, $sql );
+
+                            $sql="INSERT INTO infocard(article_id, infocard) VALUES ($article_id, '$infocard')";
+                            
+                            $log->info("infocard insert sql = $sql");
+							mysqli_query( $link, $sql );
+                        }
 
 						$response->message = "Article saved as draft!!!";
 					}
@@ -221,6 +233,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $sections = $data->sections;
         $deletedSections = $data->deletedSections;
         $article_id = $data->id;
+        $infocard = $data->infocard;
 
         $sql="
         UPDATE articles SET 
@@ -252,7 +265,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         $log->info("id is empty");
                         $sql = "INSERT INTO sections (title, content, article_id ) VALUES ";
 							
-                        $sql .= "('".$value->title."','" .base64_encode($value->description)."', $article_id)";
+                        $sql .= "('".$value->title."','" .($value->description)."', $article_id)";
                         
                         $log->info("Section insert sql = $sql");
                         mysqli_query( $link, $sql );
@@ -260,7 +273,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     else{
                         $sql = "UPDATE sections SET
                         title='$value->title',
-                        content='" .base64_encode($value->description)."',
+                        content='" .$value->description."',
                         status=null
                         WHERE id = $value->id";
                         
@@ -273,6 +286,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 foreach($deletedSections as $key => $value){
                     $sql = "DELETE from sections Where id = $value ";
                     $log->info("Section delete sql = $sql");
+                    mysqli_query( $link, $sql );
+                }
+
+                $log->info("infocard = $infocard");
+                if(!empty($infocard)){
+
+                    $sql="DELETE FROM infocard WHERE article_id=$article_id";
+                    mysqli_query( $link, $sql );
+
+                    $sql="INSERT INTO infocard(article_id, infocard) VALUES ($article_id, '$infocard')";
+                    
+                    $log->info("infocard insert sql = $sql");
                     mysqli_query( $link, $sql );
                 }
 
@@ -367,6 +392,45 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
         $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured, slug, A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
         inner join users U on A.user_id = U.id ORDER BY id ASC LIMIT $start_from,$limit";
+        
+        $result = mysqli_query( $link, $sql );  
+        $row_cnt = $result->num_rows;
+        
+        if ($result) { 
+            if($row_cnt > 0){
+                while($row = $result->fetch_array(MYSQLI_ASSOC)) {
+                        $myArray[] = $row;
+                }
+            
+                $response->success = true;
+                $response->data = $myArray;
+                $response->message = "";
+                $result->close();
+            } 
+            else 
+            {            
+                $response->success = false;
+                $response->message = "No data available in table";
+            }
+        } 
+        else {            
+            $response->success = false;
+            $response->message = "Error: " . $sql . "<br>" . mysqli_error($link);
+        }
+    }
+    
+    if($procedureName == "searchArticles")
+    {
+		$pageno = $_GET['pageno'];
+		$limit = $_GET['limit'];
+		$searchkey = $_GET['searchkey'];
+		
+		$start_from = ($pageno-1) * $limit;  
+
+        $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured, slug, A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
+        inner join users U on A.user_id = U.id 
+        WHERE title like '%$searchkey%' 
+        ORDER BY id ASC LIMIT $start_from,$limit";
         
         $result = mysqli_query( $link, $sql );  
         $row_cnt = $result->num_rows;
@@ -526,6 +590,41 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
             
                 $response->success = true;
                 $response->data = $myArray;
+                $response->message = "";
+                $result->close();
+            }
+            else 
+            {            
+                $response->success = false;
+                $response->message = "No data available in table";
+            }
+        } 
+        else {            
+            $response->success = false;
+            $response->message = "Error: " . $sql . "<br>" . mysqli_error($link);
+        }
+    }
+    
+    if($procedureName == "getArticleInfoCardBySlug")
+    {
+		$Slug = $_GET['slug'];
+		        
+        $sql = "SELECT I.infocard
+        FROM articles A 
+        inner join infocard I on I.article_id = A.id
+        where A.Slug = '$Slug'";
+
+	    //$log->info("sql=.$sql");
+        $result = mysqli_query( $link, $sql );  
+        $row_cnt = $result->num_rows;
+        
+        if ($result) { 
+            if($row_cnt > 0){
+               
+                $row = mysqli_fetch_assoc($result);                                        
+            
+                $response->success = true;
+                $response->data = $row;
                 $response->message = "";
                 $result->close();
             }

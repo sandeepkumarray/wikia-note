@@ -17,13 +17,15 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastComponent } from './pages/theme/toast/toast.component';
 import { ModalComponent } from './pages/theme/modal/modal.component';
 import { ModelsComponent } from './pages/models/models.component';
- 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DetailLinkComponent } from './pages/article/add-article/detail-link/detail-link.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     ToastComponent,
     ModalComponent,
-    ModelsComponent
+    ModelsComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,9 +37,11 @@ import { ModelsComponent } from './pages/models/models.component';
     MiscellaneousModule,
     ArticleModule,
     NgbModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [],
-  entryComponents: [ModalComponent],
+  entryComponents: [ModalComponent ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

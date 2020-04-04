@@ -36,8 +36,6 @@ export class HomeComponent implements OnInit {
     this.articleService.getTop6FeaturedArticles().
       subscribe(result => {
         this.articlesdata = (result);
-        console.log(this.articlesdata);
-        
       });
   }
 
@@ -93,7 +91,7 @@ export class HomeComponent implements OnInit {
   }
 
   gotoDetails(articleslug: any) {
-    this.router.navigate(['/article/article-view/', articleslug]);
+    this.router.navigate(['/articles/', articleslug]);
   }
 
 }

@@ -1,0 +1,80 @@
+<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingOne" style="background-color: #CCCCFF;">
+            <div class="row">
+                <div class="col-md-4">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
+                        (click)="accordionHideShow()">
+                        <i class="{{accordIcon}}"></i><label
+                            style="padding-left: 15px;">{{infoGroupDetailModal.header}}</label></button>
+                </div>
+                <div class="col-md-2 offset-md-6">
+                    <a (click)="removeObject()" style="float: right;" class="text-danger">
+                        <i class="fa fa-trash" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+        <div id="collapseOne" class="{{collapseClass}}" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h4>Info Card Group Detail</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="form-group row">
+                            <label class="label col-sm-3 col-form-label" for="input-name">
+                                <h5>Group Header</h5>
+                            </label>
+                            <div class="col-sm-9">
+                                <input class="form-control" [(ngModel)]="infoGroupDetailModal.header" #header="ngModel"
+                                    id="input-name" name="header" placeholder="Header" autofocus fullWidth
+                                    fieldSize="large" [required]="true" [minlength]="3" [maxlength]="50"
+                                    [attr.aria-invalid]="header.invalid && header.touched ? true : null">
+                                <ng-container *ngIf="header.invalid && header.touched">
+                                    <p class="text-danger" *ngIf="header.errors?.required">
+                                        Header is required!
+                                    </p>
+                                    <p class="text-danger" *ngIf="header.errors?.minlength || header.errors?.maxlength">
+                                        Header should be at least of 3 characters.
+                                    </p>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="label col-sm-3 col-form-label" for="input-name">
+                                <h5>Add Sub Group</h5>
+                            </label>
+                            <div class="col-sm-4">
+                                <div class="mt-2">
+                                    <a (click)="addComponent(addInfocardModalComponent)" class="text-primary"
+                                        style="height: 0.1px;width: 30px;">
+                                        <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <!-- Use ng-template to ensure that the generated components end up in the right place -->
+                                <ng-template #container>
+
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="card-footer">
+                    <button type="button" class="btn btn-primary" (click)="passBack()">Add</button>
+                    <button type="button" class="btn btn-danger" (click)="activeModal.close()">cancel</button>
+                </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,6 +17,11 @@ import { UiSwitchModule } from 'ngx-toggle-switch';
 import { ArticleItemComponent } from './article-infi-list/article-item/article-item.component';
 import { ArticleItemPlaceholdersComponent } from './article-infi-list/article-item-placeholders/article-item-placeholders.component';
 import { SectionViewComponent } from './article-view/section-view/section-view.component';
+import { AddInfocardModalComponent } from './add-article/add-infocard-modal/add-infocard-modal.component';
+import { DetailLinkComponent } from './add-article/detail-link/detail-link.component';
+import { AddInfocardGroupComponent } from './add-article/add-infocard-group/add-infocard-group.component';
+
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -26,7 +31,12 @@ import { SectionViewComponent } from './article-view/section-view/section-view.c
      AddSectionComponent, 
      ArticleInfiListComponent, 
      ArticleItemComponent, 
-     ArticleItemPlaceholdersComponent, SectionViewComponent
+     ArticleItemPlaceholdersComponent, 
+     SectionViewComponent,
+     AddInfocardModalComponent,
+     DetailLinkComponent,
+     AddInfocardGroupComponent,
+     
     ],
   imports: [
     CommonModule,
@@ -36,9 +46,10 @@ import { SectionViewComponent } from './article-view/section-view/section-view.c
     InfiniteScrollModule,
     NgxSummernoteModule,
     UiSwitchModule,
+    NgbAccordionModule,
   ],
   providers: [
   ],
-  entryComponents: [AddSectionComponent]
+  entryComponents: [AddSectionComponent, AddInfocardModalComponent, DetailLinkComponent, AddInfocardGroupComponent]
 })
 export class ArticleModule { }

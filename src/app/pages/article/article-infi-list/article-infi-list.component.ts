@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ArticleService } from '../article.service';
+import { ActivatedRoute } from '@angular/router';
+import { EventService } from '../../../services/event.service';
 
 @Component({
   selector: 'app-article-infi-list',
@@ -24,13 +26,27 @@ export class ArticleInfiListComponent implements OnInit {
   scrollUpDistance = 2;
   direction = '';
   modalOpen = false;
+  search_key: string;
+  noresult: boolean;
 
-  constructor(private articleService: ArticleService) {
+  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, public eventService: EventService) {
     this.appendItems(0, this.sum);
+    this.search_key = this.activatedRoute.snapshot.paramMap.get('searchkey');
+
+    if (this.search_key != null) {
+      this.onScrollDown(null);
+    }
   }
 
   ngOnInit() {
+    this.noresult = false;
     this.onScrollDown(null);
+    this.eventService.searchArticleTitleEvent.subscribe(searchkey => {
+      this.search_key = searchkey;
+      this.Card.articles = [];
+      this.Card.pageToLoadNext = 1;
+      this.onScrollDown(null);
+    });
   }
 
   loadNext(cardData) {
@@ -38,17 +54,36 @@ export class ArticleInfiListComponent implements OnInit {
 
     cardData.loading = true;
     cardData.placeholders = new Array(this.pageSize);
-    this.articleService.getAllArticles(cardData.pageToLoadNext, this.pageSize)
-      .subscribe(nextarticles => {
-        cardData.placeholders = [];
-        cardData.articles.push(...nextarticles);
-        cardData.loading = false;
-        cardData.pageToLoadNext++;
-      });
+
+    if (this.search_key != null) {
+      this.articleService.searchArticles(cardData.pageToLoadNext, this.pageSize, this.search_key)
+        .subscribe(nextarticles => {
+
+          if (nextarticles == undefined){
+            this.noresult = true;
+          }
+          cardData.placeholders = [];
+          cardData.articles.push(...nextarticles);
+          cardData.loading = false;
+          cardData.pageToLoadNext++;
+        });
+
+    }
+    else {
+      this.articleService.getAllArticles(cardData.pageToLoadNext, this.pageSize)
+        .subscribe(nextarticles => {
+          if (nextarticles == null)
+            this.noresult = false;
+
+          cardData.placeholders = [];
+          cardData.articles.push(...nextarticles);
+          cardData.loading = false;
+          cardData.pageToLoadNext++;
+        });
+    }
   }
 
   onScrollUp() {
-    console.log('scrolled up!!');
   }
 
   addItems(startIndex, endIndex, _method) {
@@ -66,8 +101,6 @@ export class ArticleInfiListComponent implements OnInit {
   }
 
   onScrollDown(ev) {
-    console.log('scrolled down!!', ev);
-
     // // add another 20 items
     // const start = this.sum;
     // this.sum += 20;
@@ -77,7 +110,6 @@ export class ArticleInfiListComponent implements OnInit {
   }
 
   onUp(ev) {
-    console.log('scrolled up!', ev);
     const start = this.sum;
     this.sum += 20;
     this.prependItems(start, this.sum);

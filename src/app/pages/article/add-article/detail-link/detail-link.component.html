@@ -1,0 +1,39 @@
+<div class="divcontainer">
+    <div>
+        <div class="form-group row">
+            <label class="label col-sm-2 col-form-label" for="input-Title">
+                <h5>Title</h5>
+            </label>
+            <div class="col-sm-9">
+                <input class="form-control" [(ngModel)]="details.title" #title="ngModel" id="input-Title" name="title"
+                    placeholder="Title" autofocus fullWidth fieldSize="large" [required]="true" [minlength]="3"
+                    [maxlength]="50" [attr.aria-invalid]="title.invalid && title.touched ? true : null">
+                <ng-container *ngIf="title.invalid && title.touched">
+                    <p class="text-danger" *ngIf="title.errors?.required">
+                        Title is required!
+                    </p>
+                    <p class="text-danger" *ngIf="title.errors?.minlength || title.errors?.maxlength">
+                        Title should be at least of 3 characters.
+                    </p>
+                </ng-container>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="label col-sm-2 col-form-label" for="input-Link">
+                <h5>Link</h5>
+            </label>
+            <div class="col-sm-9">
+                <input class="form-control" [(ngModel)]="details.link" #link="ngModel" id="input-Link" name="link"
+                    placeholder="Link" autofocus fullWidth fieldSize="large" [required]="true" [minlength]="3"
+                    [maxlength]="50" [attr.aria-invalid]="link.invalid && link.touched ? true : null">
+                <ng-container *ngIf="link.invalid && link.touched">
+                    <p class="text-danger" *ngIf="link.errors?.required">
+                        Link is required!
+                    </p>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <a (click)="removeObject()" class="btn text-primary"><i class="far fa-times-circle fa-lg"
+            style="color: red;"></i></a>
+</div>

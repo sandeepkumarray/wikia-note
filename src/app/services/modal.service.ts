@@ -11,6 +11,12 @@ import { toastStatus, ModalDetails } from '../pages/models/models.component';
 })
 export class ModalService {
 
+  openAddInfoModal(content: any, success: toastStatus, arg2: string, arg3: string) {
+    
+    const modalRef = this.modalService.open(content, { centered: true , size: 'lg', scrollable : true});
+    return modalRef;
+  }
+
   constructor(private modalService: NgbModal) { }
 
   modalDetails: ModalDetails = new ModalDetails();
@@ -45,7 +51,6 @@ export class ModalService {
 
     modalRef.result.then((result) => {
       if (result) {
-        console.log("confirm : " + result);
         return result;
       }
     });
@@ -66,7 +71,6 @@ export class ModalService {
     
     modalRef.result.then((result) => {      
       if (result) {
-        console.log("confirm : " + result);
         return result;
       }
     });

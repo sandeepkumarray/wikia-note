@@ -6,7 +6,7 @@ import { delay, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { JsonPipe } from '@angular/common';
-import { ArticleItem ,CategoryItem, ResponseModel, DynamicArticleData, SectionItem } from '../models/models.component';
+import { ArticleItem, CategoryItem, ResponseModel, DynamicArticleData, SectionItem, InfoGroupDetailModal } from '../models/models.component';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,23 @@ export class ArticleService {
   getAllArticles(pageno: number, limit: number): Observable<ArticleItem[]> {
 
     let apiURL = `${environment.serverUrl}?procedureName=getAllArticles&pageno=` + pageno + `&limit=` + limit;
+
+    if (isDevMode()) {
+      apiURL = 'assets/data/articles.json';
+      return this.http
+        .get<ArticleItem[]>(apiURL)
+        .pipe(
+          map(news => news.splice(pageno, limit)),
+          delay(1500),
+        );
+    }
+
+    return this.http.get<ArticleItem[]>(apiURL);
+  }
+
+  searchArticles(pageno: any, limit: number, search_key: string): Observable<ArticleItem[]> {
+
+    let apiURL = `${environment.serverUrl}?procedureName=searchArticles&pageno=` + pageno + `&limit=` + limit + `&searchkey=` + search_key;
 
     if (isDevMode()) {
       apiURL = 'assets/data/articles.json';
@@ -87,7 +104,7 @@ export class ArticleService {
     }
 
     articleData.procedureName = "saveArticleAsDraft";
-    
+
     var articleJson = JSON.stringify(articleData);
 
     const httpOptions = {
@@ -119,7 +136,7 @@ export class ArticleService {
     return this.http.post<ResponseModel>(apiURL, { data: categoryJson }, httpOptions);
   }
 
-  getArticleBySlug(slug: string): Observable<ArticleItem>  {
+  getArticleBySlug(slug: string): Observable<ArticleItem> {
     let apiURL = `${environment.serverUrl}?procedureName=getArticleBySlug&slug=` + slug;
     if (isDevMode()) {
       apiURL = 'assets/data/article.json';
@@ -127,14 +144,14 @@ export class ArticleService {
     return this.http.get<ArticleItem>(apiURL);
   }
 
-  getArticleSectionsBySlug(slug: string): Observable<SectionItem[]>  {
+  getArticleSectionsBySlug(slug: string): Observable<SectionItem[]> {
     let apiURL = `${environment.serverUrl}?procedureName=getArticleSectionsBySlug&slug=` + slug;
     if (isDevMode()) {
-      
+
     }
     return this.http.get<SectionItem[]>(apiURL);
   }
-  
+
   updateArticle(articleData: DynamicArticleData): Observable<ResponseModel> {
 
     let apiURL = `${environment.serverUrl}`;
@@ -144,7 +161,7 @@ export class ArticleService {
     }
 
     articleData.procedureName = "updateArticle";
-    
+
     var articleJson = JSON.stringify(articleData);
 
     const httpOptions = {
@@ -155,7 +172,7 @@ export class ArticleService {
 
     return this.http.post<ResponseModel>(apiURL, { data: articleJson }, httpOptions);
   }
-    
+
   updateArticleStatus(articleData: DynamicArticleData): Observable<ResponseModel> {
 
     let apiURL = `${environment.serverUrl}`;
@@ -165,7 +182,7 @@ export class ArticleService {
     }
 
     articleData.procedureName = "updateArticleStatus";
-    
+
     var articleJson = JSON.stringify(articleData);
 
     const httpOptions = {
@@ -175,5 +192,14 @@ export class ArticleService {
     };
 
     return this.http.post<ResponseModel>(apiURL, { data: articleJson }, httpOptions);
+  }
+
+  getArticleInfoCardBySlug(slug: string): Observable<any> {
+    let apiURL = `${environment.serverUrl}?procedureName=getArticleInfoCardBySlug&slug=` + slug;
+    if (isDevMode()) {
+
+    }
+    return this.http.get<any>(apiURL);
+
   }
 }

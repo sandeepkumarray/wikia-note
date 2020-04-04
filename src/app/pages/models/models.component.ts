@@ -43,6 +43,7 @@ export class DynamicArticleData {
   public categoryID?: any;
   public status?: any;
   public sections: SectionItem[];
+  public infocard: string;
   
   public deletedSections?: any[];
 }
@@ -89,6 +90,38 @@ export class ModalDetails {
   public yesButtonVisisble: boolean;
   public noButtonVisisble: boolean;
   public modalClass: string;
+}
+
+export class DetailsLink{
+  public title: string;
+  public link: string;
+}
+
+export class InfoDetailModal{
+  public header: string;
+  public datalist: DetailsLink[];
+}
+
+export class InfoGroupDetailModal{
+  public header: string;
+  public infoDetailList: InfoDetailModal[];
+  
+  constructor() { }
+}
+
+export class HtmlTableRowData{
+  public TableData: string;
+  public ListData: HtmlTableListData[];
+  public RowHeader: string;
+  public IsHeader: boolean;
+  public IsList: boolean;
+
+}
+
+export class HtmlTableListData{
+  public Data: string;
+  public HasHyperLink: boolean;
+  public HyperLink: string;
 }
 
 @Component({

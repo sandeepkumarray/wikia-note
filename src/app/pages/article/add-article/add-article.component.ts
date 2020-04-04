@@ -1,50 +1,44 @@
 import { Component, OnInit, ComponentFactoryResolver, Type, ViewChild, ViewContainerRef } from '@angular/core';
-
-import { FormControl, FormGroup } from '@angular/forms';
 import { ArticleService } from '../article.service';
-
 import { ActivatedRoute } from '@angular/router';
-import { AddSectionComponent } from '../add-article/add-section/add-section.component';
-
+import { AddSectionComponent } from './add-section/add-section.component';
 import { Router } from '@angular/router';
-
 import { ToastService } from '../../../services/toast.service';
-
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { ModalService } from '../../../services/modal.service';
-
-import { CategoryItem, ArticleItem, ResponseModel, DynamicArticleData, SectionItem, ComponentItem, toastStatus, ModalDetails } from '../../models/models.component';
-import { ignoreElements } from 'rxjs/operators';
+import {
+  CategoryItem, ArticleItem, ResponseModel, DynamicArticleData, SectionItem, ComponentItem, toastStatus,
+  ModalDetails, DetailsLink, InfoDetailModal, InfoGroupDetailModal
+} from '../../models/models.component';
+import { AddInfocardGroupComponent } from './add-infocard-group/add-infocard-group.component';
 
 @Component({
   selector: 'app-add-article',
   templateUrl: './add-article.component.html',
-  styleUrls: ['./add-article.component.css']
+  styleUrls: ['./add-article.component.css'],
 })
 export class AddArticleComponent implements OnInit {
 
   @ViewChild('container', { static: true, read: ViewContainerRef }) container: ViewContainerRef;
-
+  @ViewChild('infocontainer', { static: true, read: ViewContainerRef }) infocontainer: ViewContainerRef;
 
   isOpenForEdt: boolean;
   IdealIMGWidth = 564;
   IdealIMGHeight = 700;
   slug: any;
   components: ComponentItem[] = [];
+  info_components: ComponentItem[] = [];
 
   addSectionComponentClass = AddSectionComponent;
-
-  addArticleComponent = AddArticleComponent;
+  addInfocardGroupComponent = AddInfocardGroupComponent;
 
   constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, public toastService: ToastService, private modalService: ModalService,
     private router: Router, private componentFactoryResolver: ComponentFactoryResolver) {
     this.slug = this.activatedRoute.snapshot.paramMap.get('slug');
-    console.log("slug : " + this.slug);
 
     if (this.slug != null) {
       this.getArticleBySlug(this.slug);
       this.getArticleSectionsBySlug(this.slug);
+      this.getArticleInfoCardBySlug(this.slug);
       this.isOpenForEdt = true;
     }
   }
@@ -60,6 +54,7 @@ export class AddArticleComponent implements OnInit {
   editorDisabled = false;
   allSections: SectionItem[] = [];
   deletedSections: any[] = [];
+  infoGroupDetailModalList: InfoGroupDetailModal[] = [];
 
   ngOnInit() {
     this.articleService.getAllCategory().subscribe(result => {
@@ -86,17 +81,14 @@ export class AddArticleComponent implements OnInit {
 
     this.article.bannerimg = this.bannerImage;
     this.article.description = "";
-    console.log(this.article);
     var response = new ResponseModel();
     this.articleService.saveArticle(this.article).subscribe(res => {
       response = res;
-      console.log(response);
-
       if (response != null) {
         this.submitted = true;
         if (response.success) {
           this.modalService.openModal(toastStatus.success, "Post Article", response.message);
-          this.router.navigate(['/pages/article/article-view/', response.data]);
+          this.router.navigate(['/pages/articles/', response.data]);
         }
         else {
           this.modalService.openModal(toastStatus.danger, "Post Article", response.message);
@@ -120,8 +112,6 @@ export class AddArticleComponent implements OnInit {
   }
 
   SummaryInit(event) {
-    console.log('SummaryInit');
-    console.log(event)
   }
 
   enableEditor() {
@@ -133,8 +123,6 @@ export class AddArticleComponent implements OnInit {
   }
 
   onDelete(event) {
-    console.log('onDelete');
-    console.log(event)
   }
 
   addComponent(componentClass: Type<AddSectionComponent>) {
@@ -166,6 +154,36 @@ export class AddArticleComponent implements OnInit {
       sections.push(item.component.instance.section);
     });
 
+    sections.forEach(sec => {
+      sec.description = encodeURIComponent(sec.description);
+    });
+
+    this.infoGroupDetailModalList = [];
+
+    this.info_components.forEach(comp => {
+      let infoGroupDetailModal: InfoGroupDetailModal = new InfoGroupDetailModal();
+      infoGroupDetailModal.infoDetailList = [];
+      infoGroupDetailModal.header = comp.component.instance.infoGroupDetailModal.header;
+      comp.component.instance.components.forEach(subComp => {
+        let infoDetailModal: InfoDetailModal = new InfoDetailModal();
+        infoDetailModal.datalist = [];
+        infoDetailModal.header = subComp.component.instance.infoDetails.header;
+        subComp.component.instance.components.map(function (item) {
+          var existItem = res.find(x => x.component.instance.details.title == item.component.instance.details.title);
+          if (existItem) {
+            dup.push(existItem);
+          }
+          else
+            res.push(item);
+          infoDetailModal.datalist.push(item.component.instance.details);
+        });
+        infoGroupDetailModal.infoDetailList.push(infoDetailModal);
+      });
+      this.infoGroupDetailModalList.push(infoGroupDetailModal);
+    });
+
+    let infoCardString = JSON.stringify(this.infoGroupDetailModalList);
+
     if (dup != undefined && dup.length > 0) {
       this.modalService.openModal(toastStatus.danger, "Save Article As Draft", "Duplicate section title found.");
     }
@@ -178,21 +196,20 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.isactive = 1;
       this.dynamicArticle.isfeatured = this.article.is_featured ? 1 : 0;
       this.dynamicArticle.userid = 1;
-      this.dynamicArticle.sections = sections;      
-      this.dynamicArticle.slug =this.dynamicArticle.title.split(" ").join("_");
+      this.dynamicArticle.sections = sections;
+      this.dynamicArticle.infocard = infoCardString;
+      this.dynamicArticle.slug = this.dynamicArticle.title.split(" ").join("_");
 
       var response = new ResponseModel();
 
       if (!this.isOpenForEdt) {
         this.articleService.saveArticleAsDraft(this.dynamicArticle).subscribe(res => {
           response = res;
-          console.log(response);
-
           if (response != null) {
-            this.submitted = true;
             if (response.success) {
+              this.submitted = true;
               this.modalService.openModal(toastStatus.success, "Save Article As Draft", response.message);
-              this.router.navigate(['/article/article-view/', this.dynamicArticle.slug]);
+              this.router.navigate(['/articles/', this.dynamicArticle.slug]);
             }
             else {
               this.modalService.openModal(toastStatus.danger, "Save Article As Draft", response.message);
@@ -204,21 +221,17 @@ export class AddArticleComponent implements OnInit {
         });
       }
       else {
-        console.log(this.deletedSections);
-        
         this.dynamicArticle.id = this.article.id;
         this.dynamicArticle.status = 1;
         this.dynamicArticle.deletedSections = this.deletedSections;
-        
+
         this.articleService.updateArticle(this.dynamicArticle).subscribe(res => {
           response = res;
-          console.log(response);
-
           if (response != null) {
-            this.submitted = true;
             if (response.success) {
+              this.submitted = true;
               this.modalService.openModal(toastStatus.success, "Update Article", response.message);
-              this.router.navigate(['/article/article-view/', this.dynamicArticle.slug]);
+              this.router.navigate(['/articles/', this.dynamicArticle.slug]);
             }
             else {
               this.modalService.openModal(toastStatus.danger, "Update Article", response.message);
@@ -260,13 +273,11 @@ export class AddArticleComponent implements OnInit {
     var response = new ResponseModel();
     this.articleService.updateArticleStatus(this.dynamicArticle).subscribe(res => {
       response = res;
-      console.log(response);
-
       if (response != null) {
-        this.submitted = true;
         if (response.success) {
+          this.submitted = true;
           this.modalService.openModal(toastStatus.success, "Post Article", "Article is published.");
-          this.router.navigate(['/article/article-view/', this.dynamicArticle.slug]);
+          this.router.navigate(['/articles/', this.dynamicArticle.slug]);
         }
         else {
           this.modalService.openModal(toastStatus.danger, "Update Article", response.message);
@@ -292,37 +303,23 @@ export class AddArticleComponent implements OnInit {
         this.article.is_active = data.is_active;
         this.article.created_at = data.created_at;
         this.article.slug = data.slug;
-
-        this.article.description = atob(data.description);
-
       });
   }
 
   getArticleSectionsBySlug(slug: string) {
     this.articleService.getArticleSectionsBySlug(slug)
       .subscribe((data: SectionItem[]) => {
-        data.map(sec => {
-          let section: SectionItem = new SectionItem();
-          section.id = sec.id;
-          section.title = sec.title;
-          section.status = sec.status;
-          section.description = atob(sec.description);
-          this.addSectionComponent(this.addSectionComponentClass, section);
-        });
+        if (data != null) {
+          data.map(sec => {
+            let section: SectionItem = new SectionItem();
+            section.id = sec.id;
+            section.title = sec.title;
+            section.status = sec.status;
+            section.description = decodeURIComponent(sec.description);
+            this.addSectionComponent(this.addSectionComponentClass, section);
+          });
+        }
       });
-
-
-    // => {
-    //   let section :SectionItem = new SectionItem();
-    //   console.log(data);
-
-    //   section.id = data.id;
-    //   section.title = data.title;
-    //   section.status = data.status;
-    //   section.description = atob(data.description);
-
-    //   this.addSectionComponent(this.addSectionComponentClass, section);
-    // });
   }
 
   addSectionComponent(componentClass: Type<AddSectionComponent>, section: SectionItem) {
@@ -337,9 +334,70 @@ export class AddArticleComponent implements OnInit {
     component.instance._ref = component;
     component.instance.section = section;
     component.instance.passDeleteEntry.subscribe((idEntry) => {
-      console.log(idEntry);
       this.deletedSections.push(idEntry);
     })
     this.components.push(compItem);
   }
+
+  addInfoComponent(componentClass: Type<AddInfocardGroupComponent>) {
+    // Create component dynamically inside the ng-template
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentClass);
+    const component = this.infocontainer.createComponent(componentFactory);
+
+    // Push the component so that we can keep track of which components are created
+    var compItem = new ComponentItem();
+    compItem.component = component;
+    compItem.id = this.components.length == 0 ? 1 : Math.max.apply(Math, this.components.map(function (o) { return o.id; })) + 1;
+    component.instance._ref = component;
+    component.instance._id = compItem.id;
+
+
+    component.instance.passDeleteEntry.subscribe((idEntry) => {
+      const index: number = this.components.findIndex(item => item.id == idEntry);
+      if (index !== -1) {
+        this.components.splice(index, 1);
+      }
+    })
+
+    this.info_components.push(compItem);
+  }
+
+  getArticleInfoCardBySlug(slug: string) {
+    this.articleService.getArticleInfoCardBySlug(slug)
+      .subscribe((data: any) => {
+        let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(data.infocard);
+        if (infoGroupDetailList != null) {
+          infoGroupDetailList.map(sec => {
+            this.addInfoCardComponent(this.addInfocardGroupComponent, sec);
+          });
+        }
+      });
+  }
+
+  addInfoCardComponent(componentClass: Type<AddInfocardGroupComponent>, infoGroupDetailModal: InfoGroupDetailModal) {
+    // Create component dynamically inside the ng-template
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentClass);
+    const component = this.infocontainer.createComponent(componentFactory);
+    // Push the component so that we can keep track of which components are created
+    var compItem = new ComponentItem();
+    compItem.component = component;
+    compItem.id = this.info_components.length == 0 ? 1 : Math.max.apply(Math, this.info_components.map(function (o) { return o.id; })) + 1;
+    component.instance._ref = component;
+    component.instance._id = compItem.id;
+    component.instance.infoGroupDetailModal = infoGroupDetailModal;
+
+    component.instance.passDeleteEntry.subscribe((idEntry) => {
+      const index: number = this.info_components.findIndex(item => item.id == idEntry);
+      if (index !== -1) {
+        this.info_components.splice(index, 1);
+      }
+    })
+
+    infoGroupDetailModal.infoDetailList.forEach(infoDetailModal => {
+      component.instance.addInfocardComponent(component.instance.addInfocardModalComponent, infoDetailModal);
+    });
+
+    this.info_components.push(compItem);
+  }
+
 }

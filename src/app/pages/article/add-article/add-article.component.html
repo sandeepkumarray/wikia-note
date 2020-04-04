@@ -1,179 +1,215 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3>Add Article</h3>
-            </div>
-            <div class="card-body">
-                <div>
-                    <form #articleform="ngForm">
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-name">
-                                <h5>Title</h5>
-                            </label>
-                            <div class="col-sm-9">
-                                <input class="form-control" [(ngModel)]="article.title" #title="ngModel" id="input-name"
-                                    name="title" placeholder="Title" autofocus fullWidth fieldSize="large"
-                                    [required]="true" [minlength]="3" [maxlength]="50"
-                                    [attr.aria-invalid]="title.invalid && title.touched ? true : null">
-                                <ng-container *ngIf="title.invalid && title.touched">
-                                    <p class="text-danger" *ngIf="title.errors?.required">
-                                        Title is required!
-                                    </p>
-                                    <p class="text-danger" *ngIf="title.errors?.minlength || title.errors?.maxlength">
-                                        Title should be at least of 3 characters.
-                                    </p>
-                                </ng-container>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-category">
-                                <h5>Category</h5>
-                            </label>
-                            <div class="col-sm-4">
-                                <select class="form-control" selected="0" [(ngModel)]="article.category"
-                                    #category="ngModel" id="input-category" name="category"
-                                    placeholder="Select Category" fullWidth fieldSize="large" [required]="true">
-                                    <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}
-                                    </option>
-                                </select>
-                                <ng-container *ngIf="category.invalid && category.touched">
-                                    <p class="text-danger" *ngIf="category.errors?.required">
-                                        Category is required!
-                                    </p>
-                                </ng-container>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="mt-2">
-                                    <a (click)="addCategory()" class="text-primary">
-                                        <i class="fa fa-plus-circle" aria-hidden="true"></i></a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bd-div">
+<div class="container-fluid" style="color: black;background-color: #ffffff !important;">
+    <div class="row flex-xl-nowrap text-left">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Add Article</h3>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <form #articleform="ngForm">
                             <div class="form-group row">
-                                <label class="label col-sm-2 col-form-label" for="input-category">
-                                    <h5>Image</h5>
+                                <label class="label col-sm-2 col-form-label" for="input-name">
+                                    <h5>Title</h5>
                                 </label>
-                                <div class="col-sm-1">
-                                    <div class="mt-2">
-                                        <a (click)="selectFile.click()" class="text-primary"
-                                            style="height: 0.1px;width: 30px;">
-                                            <i class="fa fa-upload"></i>
-                                            <input type="file" id="bannerImage" class="form-control" accept="image/*"
-                                                #selectFile (change)="onImageChange($event)" style="display: none;">
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="imgcontainer">
-                                        <img src="" #imgBanner [src]="bannerImage" alt="" class="img"
-                                            style="width: 50px; height: 50px" (load)="onImageLoad($event)">
-                                        <a (click)="bannerImage=''" class="btn text-primary"><i
-                                                class="far fa-times-circle"></i></a>
-
-                                    </div>
-                                </div>
-                                <div>
+                                <div class="col-sm-9">
+                                    <input class="form-control" [(ngModel)]="article.title" #title="ngModel"
+                                        id="input-name" name="title" placeholder="Title" autofocus fullWidth
+                                        fieldSize="large" [required]="true" [minlength]="3" [maxlength]="50"
+                                        [attr.aria-invalid]="title.invalid && title.touched ? true : null">
+                                    <ng-container *ngIf="title.invalid && title.touched">
+                                        <p class="text-danger" *ngIf="title.errors?.required">
+                                            Title is required!
+                                        </p>
+                                        <p class="text-danger"
+                                            *ngIf="title.errors?.minlength || title.errors?.maxlength">
+                                            Title should be at least of 3 characters.
+                                        </p>
+                                    </ng-container>
                                 </div>
                             </div>
 
                             <div class="form-group row">
                                 <label class="label col-sm-2 col-form-label" for="input-category">
-                                    <h5>Info Card Details</h5>
+                                    <h5>Category</h5>
                                 </label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" selected="0" [(ngModel)]="article.category"
+                                        #category="ngModel" id="input-category" name="category"
+                                        placeholder="Select Category" fullWidth fieldSize="large" [required]="true">
+                                        <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}
+                                        </option>
+                                    </select>
+                                    <ng-container *ngIf="category.invalid && category.touched">
+                                        <p class="text-danger" *ngIf="category.errors?.required">
+                                            Category is required!
+                                        </p>
+                                    </ng-container>
+                                </div>
                                 <div class="col-sm-4">
                                     <div class="mt-2">
                                         <a (click)="addCategory()" class="text-primary">
-                                            <i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                            <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-summary">
-                                <h5>Summary</h5>
-                            </label>
-                            <div class="col-sm-9">
-                                <textarea class="form-control" [(ngModel)]="article.summary" #summary="ngModel"
-                                    id="input-summary" name="summary" placeholder="Summary" fullWidth fieldSize="large"
-                                    [required]="true"
-                                    [attr.aria-invalid]="summary.invalid && summary.touched ? true : null"
-                                    [minlength]="10" [maxlength]="150" style="min-height: 50px;"></textarea>
-                                <ng-container *ngIf="summary.invalid && summary.touched">
-                                    <p class="text-danger" *ngIf="summary.errors?.required">
-                                        Summary is required!
-                                    </p>
-                                    <p class="text-danger" *ngIf="title.errors?.minlength || title.errors?.maxlength">
-                                        Title should be at least of 10 characters.
-                                    </p>
-                                </ng-container>
+                            <div class="bd-div">
+                                <div class="form-group row">
+                                    <label class="label col-sm-3 col-form-label" for="input-category">
+                                        <h5>Image</h5>
+                                    </label>
+                                    <div class="col-sm-1">
+                                        <div class="mt-2">
+                                            <a (click)="selectFile.click()" class="text-primary"
+                                                style="height: 0.1px;width: 30px;">
+                                                <i class="fa fa-upload fa-lg"></i>
+                                                <input type="file" id="bannerImage" class="form-control"
+                                                    accept="image/*" #selectFile (change)="onImageChange($event)"
+                                                    style="display: none;">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="imgcontainer">
+                                            <img src="" #imgBanner [src]="bannerImage" alt="" class="img"
+                                                style="width: 50px; height: 50px" (load)="onImageLoad($event)">
+                                            <a (click)="bannerImage=''" class="btn text-primary"><i
+                                                    class="far fa-times-circle fa-lg" style="color: red;"></i></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="label col-sm-3 col-form-label" for="input-category">
+                                        <h5>Info Card Details</h5>
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <div class="mt-2">
+                                            <a (click)="addInfoComponent(addInfocardGroupComponent)"
+                                                class="text-primary">
+                                                <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <ng-template #infocontainer>
+
+                                        </ng-template>
+                                        <!-- Use ng-template to ensure that the generated components end up in the right place -->
+
+                                    </div>
+                                </div>
+                                <!-- 
+                                <div class="form-group row">
+                                    <label class="label col-sm-2 col-form-label" for="input-category">
+                                        <h5></h5>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <div *ngFor="let infod of InfoDetailModalList">
+                                            <div>
+                                                <div class="col-sm-9">
+                                                    <h3>{{infod.header}}</h3>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <ul>
+                                                        <li *ngFor="let data of infod.datalist">
+                                                            <label>{{data.title}}</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
                             </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-name">
-                                <h5>Featured?</h5>
-                            </label>
-                            <!-- <nb-checkbox name="is_featured" [(ngModel)]="article.is_featured">
-                <h5>Featured Article</h5>
-              </nb-checkbox> -->
-                            <div class="col-sm-9">
-                                <ui-switch name="is_featured" [(ngModel)]="article.is_featured" size="small"
-                                    color="lawngreen" switchColor="#3366ff">
-                                    <h5>Featured?</h5>
-                                </ui-switch>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-name">
-                                <h5>Add Section</h5>
-                            </label>
-                            <div class="col-sm-4">
-                                <div class="mt-2">
-                                    <a (click)="addComponent(addSectionComponentClass)" class="text-primary"
-                                        style="height: 0.1px;width: 30px;">
-                                        <i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                            <div class="form-group row">
+                                <label class="label col-sm-2 col-form-label" for="input-summary">
+                                    <h5>Summary</h5>
+                                </label>
+                                <div class="col-sm-9">
+                                    <textarea class="form-control" [(ngModel)]="article.summary" #summary="ngModel"
+                                        id="input-summary" name="summary" placeholder="Summary" fullWidth
+                                        fieldSize="large" [required]="true"
+                                        [attr.aria-invalid]="summary.invalid && summary.touched ? true : null"
+                                        [minlength]="10" [maxlength]="150" style="min-height: 50px;"></textarea>
+                                    <ng-container *ngIf="summary.invalid && summary.touched">
+                                        <p class="text-danger" *ngIf="summary.errors?.required">
+                                            Summary is required!
+                                        </p>
+                                        <p class="text-danger"
+                                            *ngIf="summary.errors?.minlength || summary.errors?.maxlength">
+                                            Summary should be at least of 10 characters.
+                                        </p>
+                                    </ng-container>
                                 </div>
                             </div>
 
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <!-- Use ng-template to ensure that the generated components end up in the right place -->
-                                <ng-template #container>
-
-                                </ng-template>
+                            <div class="form-group row">
+                                <label class="label col-sm-2 col-form-label" for="input-name">
+                                    <h5>Featured?</h5>
+                                </label>
+                                <!-- <nb-checkbox name="is_featured" [(ngModel)]="article.is_featured">
+                <h5>Featured Article</h5>
+              </nb-checkbox> -->
+                                <div class="col-sm-9">
+                                    <ui-switch name="is_featured" [(ngModel)]="article.is_featured" size="small"
+                                        color="lawngreen" switchColor="#3366ff">
+                                        <h5>Featured?</h5>
+                                    </ui-switch>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <label class="label col-sm-2 col-form-label" for="input-name">
-                                <h5></h5>
-                            </label>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-primary btn-block"
-                                    [disabled]="submitted || !articleform.valid" [class.btn-pulse]="submitted"
-                                    (click)="saveAsDraft()">Draft</button>
-                            </div>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-primary btn-block" *ngIf="isOpenForEdt"
-                                    [disabled]="submitted || !articleform.valid" [class.btn-pulse]="submitted"
-                                    (click)="postArticle()">Post</button>
-                            </div>
-                        </div>
+                            <div class="form-group row">
+                                <label class="label col-sm-2 col-form-label" for="input-name">
+                                    <h5>Add Section</h5>
+                                </label>
+                                <div class="col-sm-4">
+                                    <div class="mt-2">
+                                        <a (click)="addComponent(addSectionComponentClass)" class="text-primary"
+                                            style="height: 0.1px;width: 30px;">
+                                            <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
+                                    </div>
+                                </div>
 
-                        <!--<h3>HTML</h3>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <!-- Use ng-template to ensure that the generated components end up in the right place -->
+                                    <ng-template #container>
+
+                                    </ng-template>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="label col-sm-2 col-form-label" for="input-name">
+                                    <h5></h5>
+                                </label>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        [disabled]="submitted || !articleform.valid" [class.btn-pulse]="submitted"
+                                        (click)="saveAsDraft()">Draft</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-block" *ngIf="isOpenForEdt"
+                                        [disabled]="submitted || !articleform.valid" [class.btn-pulse]="submitted"
+                                        (click)="postArticle()">Post</button>
+                                </div>
+                            </div>
+
+                            <!--<h3>HTML</h3>
               <div [ngxSummernoteView]="article.summary"></div>
                           
               <h3>Code</h3>
               <pre>{{article.summary}}</pre> -->
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

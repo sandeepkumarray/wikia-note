@@ -17,7 +17,7 @@ const routes: Routes = [
       .then(m => m.ArticleModule),
   },
   {
-    path: 'article/:slug',
+    path: 'articles/:slug',
     component: ArticleViewComponent,
   },
   {

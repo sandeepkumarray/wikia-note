@@ -14,6 +14,10 @@ const routes: Routes = [{
       {
         path: 'articles',
         component: ArticleInfiListComponent,
+      }, 
+      {
+        path: 'search/:searchkey',
+        component: ArticleInfiListComponent,
       },
       {
         path: 'add-article',

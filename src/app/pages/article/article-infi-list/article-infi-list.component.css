@@ -4,7 +4,7 @@ p {
   .search-results {
     height: 100%;
   }
-  .title {
+  /* .title {
     position: fixed;
     top: 50%;
     transform: translateY(-70%);
@@ -15,4 +15,21 @@ p {
   }
   .title small {
     color: #eaeaea;
+  } */
+
+  .flex-centered {
+    margin: auto;
+  }
+  nb-card-body {
+    display: flex;
+  }
+  
+  .title {
+    text-align: center;
+  }
+  
+  .sub-title {
+    text-align: center;
+    display: block;
+    margin-bottom: 3rem;
   }

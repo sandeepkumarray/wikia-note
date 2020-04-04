@@ -19,6 +19,6 @@ export class ArticleItemComponent implements OnInit {
   }
 
   gotoDetails(articleslug: any) {
-    this.router.navigate(['/article/article-view/', articleslug]);
+    this.router.navigate(['/articles/', articleslug]);
   }
 }
