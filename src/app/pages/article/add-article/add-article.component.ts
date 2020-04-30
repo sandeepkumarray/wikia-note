@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, Type, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ArticleService } from '../article.service';
 import { ActivatedRoute } from '@angular/router';
 import { AddSectionComponent } from './add-section/add-section.component';
@@ -15,12 +15,15 @@ import { AddInfocardGroupComponent } from './add-infocard-group/add-infocard-gro
   selector: 'app-add-article',
   templateUrl: './add-article.component.html',
   styleUrls: ['./add-article.component.css'],
+
+  encapsulation: ViewEncapsulation.None
 })
 export class AddArticleComponent implements OnInit {
 
   @ViewChild('container', { static: true, read: ViewContainerRef }) container: ViewContainerRef;
   @ViewChild('infocontainer', { static: true, read: ViewContainerRef }) infocontainer: ViewContainerRef;
 
+  isTemplate: boolean = false;
   isOpenForEdt: boolean;
   IdealIMGWidth = 564;
   IdealIMGHeight = 700;
@@ -30,6 +33,8 @@ export class AddArticleComponent implements OnInit {
 
   addSectionComponentClass = AddSectionComponent;
   addInfocardGroupComponent = AddInfocardGroupComponent;
+
+  public addTagNowRef: (name)=>void;
 
   constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, public toastService: ToastService, private modalService: ModalService,
     private router: Router, private componentFactoryResolver: ComponentFactoryResolver) {
@@ -41,7 +46,19 @@ export class AddArticleComponent implements OnInit {
       this.getArticleInfoCardBySlug(this.slug);
       this.isOpenForEdt = true;
     }
+    if (this.router.url.includes('/article/add-template')) {
+      this.isTemplate = true;
+    }
+
+    this.addTagNowRef = (name) => this.addNewCategory(name);
   }
+
+  // addTagPromise : new Promise<any>(){
+
+  // };
+
+  loading = false;
+  enableAddCategory = false;
 
   bannerImage: any;
   blankImage: string = "assets\img\blank.png";
@@ -56,12 +73,14 @@ export class AddArticleComponent implements OnInit {
   deletedSections: any[] = [];
   infoGroupDetailModalList: InfoGroupDetailModal[] = [];
 
+
   ngOnInit() {
     this.articleService.getAllCategory().subscribe(result => {
       this.categories = [];
       this.categories = this.categories.concat(result);
     });
   }
+
 
   onImageChange(event) {
     let image: any = event.target.files[0];
@@ -139,6 +158,49 @@ export class AddArticleComponent implements OnInit {
   }
 
   saveAsDraft() {
+    this.saveAsDraftMethod();
+
+    var response = new ResponseModel();
+
+    if (!this.isOpenForEdt) {
+      this.articleService.saveArticleAsDraft(this.dynamicArticle).subscribe(res => {
+        response = res;
+        if (response != null) {
+          if (response.success) {
+            this.submitted = true;
+            this.modalService.openModal(toastStatus.success, "Save Article As Draft", response.message);
+            this.router.navigate(['/articles/', this.dynamicArticle.slug]);
+          }
+          else {
+            this.modalService.openModal(toastStatus.danger, "Save Article As Draft", response.message);
+          }
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Save Article As Draft", "Error while saving article.");
+        }
+      });
+    }
+    else {
+      this.articleService.updateArticle(this.dynamicArticle).subscribe(res => {
+        response = res;
+        if (response != null) {
+          if (response.success) {
+            this.submitted = true;
+            this.modalService.openModal(toastStatus.success, "Update Article", response.message);
+            this.router.navigate(['/articles/', this.dynamicArticle.slug]);
+          }
+          else {
+            this.modalService.openModal(toastStatus.danger, "Update Article", response.message);
+          }
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Update Article", "Error while saving article.");
+        }
+      });
+    }
+  }
+
+  saveAsDraftMethod() {
 
     let res = [];
     let dup = [];
@@ -155,9 +217,12 @@ export class AddArticleComponent implements OnInit {
     });
 
     sections.forEach(sec => {
+      sec.description = sec.description.replace('"', "[QUOTE]");
       sec.description = encodeURIComponent(sec.description);
     });
 
+    let infores = [];
+    let infodup = [];
     this.infoGroupDetailModalList = [];
 
     this.info_components.forEach(comp => {
@@ -169,12 +234,12 @@ export class AddArticleComponent implements OnInit {
         infoDetailModal.datalist = [];
         infoDetailModal.header = subComp.component.instance.infoDetails.header;
         subComp.component.instance.components.map(function (item) {
-          var existItem = res.find(x => x.component.instance.details.title == item.component.instance.details.title);
+          var existItem = infores.find(x => x.component.instance.details.title == item.component.instance.details.title);
           if (existItem) {
-            dup.push(existItem);
+            infodup.push(existItem);
           }
           else
-            res.push(item);
+            infores.push(item);
           infoDetailModal.datalist.push(item.component.instance.details);
         });
         infoGroupDetailModal.infoDetailList.push(infoDetailModal);
@@ -183,6 +248,7 @@ export class AddArticleComponent implements OnInit {
     });
 
     let infoCardString = JSON.stringify(this.infoGroupDetailModalList);
+    console.log(infoCardString);
 
     if (dup != undefined && dup.length > 0) {
       this.modalService.openModal(toastStatus.danger, "Save Article As Draft", "Duplicate section title found.");
@@ -192,7 +258,7 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.summary = this.article.summary;
       this.dynamicArticle.description = this.article.description;
       this.dynamicArticle.bannerimg = this.bannerImage;
-      this.dynamicArticle.categoryID = this.article.category;
+      this.dynamicArticle.categoryID = this.article.category.map(x => x).join(",");
       this.dynamicArticle.isactive = 1;
       this.dynamicArticle.isfeatured = this.article.is_featured ? 1 : 0;
       this.dynamicArticle.userid = 1;
@@ -200,53 +266,20 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.infocard = infoCardString;
       this.dynamicArticle.slug = this.dynamicArticle.title.split(" ").join("_");
 
+      if (this.isTemplate)
+        this.dynamicArticle.type = "1";
+      else
+        this.dynamicArticle.type = "2";
+
       var response = new ResponseModel();
 
-      if (!this.isOpenForEdt) {
-        this.articleService.saveArticleAsDraft(this.dynamicArticle).subscribe(res => {
-          response = res;
-          if (response != null) {
-            if (response.success) {
-              this.submitted = true;
-              this.modalService.openModal(toastStatus.success, "Save Article As Draft", response.message);
-              this.router.navigate(['/articles/', this.dynamicArticle.slug]);
-            }
-            else {
-              this.modalService.openModal(toastStatus.danger, "Save Article As Draft", response.message);
-            }
-          }
-          else {
-            this.modalService.openModal(toastStatus.danger, "Save Article As Draft", "Error while saving article.");
-          }
-        });
-      }
-      else {
+      if (this.isOpenForEdt) {
         this.dynamicArticle.id = this.article.id;
         this.dynamicArticle.status = 1;
         this.dynamicArticle.deletedSections = this.deletedSections;
 
-        this.articleService.updateArticle(this.dynamicArticle).subscribe(res => {
-          response = res;
-          if (response != null) {
-            if (response.success) {
-              this.submitted = true;
-              this.modalService.openModal(toastStatus.success, "Update Article", response.message);
-              this.router.navigate(['/articles/', this.dynamicArticle.slug]);
-            }
-            else {
-              this.modalService.openModal(toastStatus.danger, "Update Article", response.message);
-            }
-          }
-          else {
-            this.modalService.openModal(toastStatus.danger, "Update Article", "Error while saving article.");
-          }
-        });
       }
     }
-  }
-
-  addCategory() {
-    const modalRef = this.modalService.openModal(toastStatus.success, "Save Article As Draft", "Error while saving article.");
   }
 
   showToast(type: toastStatus, title: string, body: string) {
@@ -267,26 +300,49 @@ export class AddArticleComponent implements OnInit {
   }
 
   postArticle() {
-    this.saveAsDraft();
+    this.saveAsDraftMethod();
     this.dynamicArticle.status = 2;
 
     var response = new ResponseModel();
-    this.articleService.updateArticleStatus(this.dynamicArticle).subscribe(res => {
+    this.articleService.updateArticle(this.dynamicArticle).subscribe(res => {
       response = res;
       if (response != null) {
         if (response.success) {
-          this.submitted = true;
-          this.modalService.openModal(toastStatus.success, "Post Article", "Article is published.");
-          this.router.navigate(['/articles/', this.dynamicArticle.slug]);
+          this.articleService.updateArticleStatus(this.dynamicArticle).subscribe(res => {
+            response = res;
+            if (response != null) {
+              if (response.success) {
+                this.submitted = true;
+                this.modalService.openModal(toastStatus.success, "Post Article", "Article is published.");
+                this.router.navigate(['/articles/', this.dynamicArticle.slug]);
+              }
+              else {
+                this.modalService.openModal(toastStatus.danger, "Post Article", response.message);
+              }
+            }
+            else {
+              this.modalService.openModal(toastStatus.danger, "Post Article", "Error while publishing article.");
+            }
+          });
         }
         else {
-          this.modalService.openModal(toastStatus.danger, "Update Article", response.message);
+          this.modalService.openModal(toastStatus.danger, "Post Article", response.message);
         }
       }
       else {
-        this.modalService.openModal(toastStatus.danger, "Update Article", "Error while saving article.");
+        this.modalService.openModal(toastStatus.danger, "Post Article", "Error while publishing article.");
       }
     });
+  }
+
+  canceladdEditArticle() {
+
+    if (!this.isOpenForEdt) {
+      this.router.navigate(['/article/articles']);
+    }
+    else {
+      this.router.navigate(['/article/articles']);
+    }
   }
 
   getArticleBySlug(slug: string) {
@@ -295,15 +351,17 @@ export class AddArticleComponent implements OnInit {
         this.article.id = data.id;
         this.article.title = data.title;
         this.article.user = data.user;
-        this.article.category = data.category;
+        this.article.category = data.category.split(',');;
         this.article.summary = data.summary;
         this.article.bannerimg = data.banner;
         this.bannerImage = data.banner;
-        this.article.is_featured = data.is_featured == 1 ? "true" : "false";
+        this.article.is_featured = data.is_featured == 1 ? true : false;
         this.article.is_active = data.is_active;
         this.article.created_at = data.created_at;
         this.article.slug = data.slug;
       });
+
+
   }
 
   getArticleSectionsBySlug(slug: string) {
@@ -316,6 +374,7 @@ export class AddArticleComponent implements OnInit {
             section.title = sec.title;
             section.status = sec.status;
             section.description = decodeURIComponent(sec.description);
+            section.description = section.description.replace("[QUOTE]", '"');
             this.addSectionComponent(this.addSectionComponentClass, section);
           });
         }
@@ -400,4 +459,35 @@ export class AddArticleComponent implements OnInit {
     this.info_components.push(compItem);
   }
 
+  addNewCategory(category_name: string) {
+    this.loading = true;
+    setTimeout(() => {
+      var response = new ResponseModel();
+      let categoryItem: CategoryItem = new CategoryItem();
+      console.log(category_name);
+
+      categoryItem.category_name = category_name;
+      this.articleService.saveCategory(categoryItem).subscribe(res => {
+        response = res;
+        if (response != null) {
+          if (response.success) {
+            this.submitted = true;
+            //resolve({ id: response.data, category_name, valid: true });
+            this.articleService.getAllCategory().subscribe(result => {
+              this.categories = [];
+              this.categories = this.categories.concat(result);
+            });
+          }
+          else {
+            this.modalService.openModal(toastStatus.danger, "Add Category", response.message);
+          }
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Add Category", "Error while adding Category.");
+        }
+      });
+      this.loading = false;
+    }, 1000);
+
+  }
 }

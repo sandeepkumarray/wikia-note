@@ -31,26 +31,32 @@
 
                             <div class="form-group row">
                                 <label class="label col-sm-2 col-form-label" for="input-category">
-                                    <h5>Category</h5>
+                                    <h5>Category Tags</h5>
                                 </label>
                                 <div class="col-sm-4">
-                                    <select class="form-control" selected="0" [(ngModel)]="article.category"
+                                    <!-- <select class="form-control" selected="0" [(ngModel)]="article.category"
                                         #category="ngModel" id="input-category" name="category"
                                         placeholder="Select Category" fullWidth fieldSize="large" [required]="true">
                                         <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}
                                         </option>
-                                    </select>
+                                    </select> -->
+
+                                    <ng-select #category="ngModel" id="input-category" name="category"
+                                        [items]="categories" [addTag]="addTagNowRef" multiple="false"
+                                        bindLabel="category_name" bindValue="id" placeholder="select category"
+                                        [loading]="loading" [(ngModel)]="article.category">
+                                        <ng-template ng-tag-tmp let-search="searchTerm">
+                                            <div>
+                                                <b>Add New</b> : {{search}}
+                                            </div>
+                                        </ng-template>
+                                    </ng-select>
+
                                     <ng-container *ngIf="category.invalid && category.touched">
                                         <p class="text-danger" *ngIf="category.errors?.required">
                                             Category is required!
                                         </p>
                                     </ng-container>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="mt-2">
-                                        <a (click)="addCategory()" class="text-primary">
-                                            <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
-                                    </div>
                                 </div>
                             </div>
 
@@ -73,7 +79,7 @@
                                     <div class="col-sm-6">
                                         <div class="imgcontainer">
                                             <img src="" #imgBanner [src]="bannerImage" alt="" class="img"
-                                                style="width: 50px; height: 50px" (load)="onImageLoad($event)">
+                                                (load)="onImageLoad($event)">
                                             <a (click)="bannerImage=''" class="btn text-primary"><i
                                                     class="far fa-times-circle fa-lg" style="color: red;"></i></a>
 
@@ -199,7 +205,11 @@
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-primary btn-block" *ngIf="isOpenForEdt"
                                         [disabled]="submitted || !articleform.valid" [class.btn-pulse]="submitted"
-                                        (click)="postArticle()">Post</button>
+                                        (click)="postArticle()">Publish</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-block" *ngIf="isOpenForEdt"
+                                        (click)="canceladdEditArticle()">Cancel</button>
                                 </div>
                             </div>
 

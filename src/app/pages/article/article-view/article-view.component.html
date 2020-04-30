@@ -14,6 +14,7 @@
     </div>
     <div class="card-body">
       <!-- <div [innerHTML]="article.description"></div> -->
+
       <table class="infobox vevent" style="width:22em">
         <tbody>
           <tr>
@@ -21,10 +22,10 @@
               style="text-align:center;font-size:125%;font-weight:bold;font-style: italic; background: #CCCCFF; padding: 0.25em 1em; line-height: 1.5em; line-height: normal;">
               {{article.title}}</th>
           </tr>
-          <tr *ngIf="article.bannerimg">
+          <tr>
             <td colspan="2" style="text-align:center">
               <a class="image">
-                <img [src]="article.bannerimg" decoding="async" style="max-width: 250px; max-height: 350px;">
+                <img alt="" [src]="article.bannerimg" decoding="async" style="max-width: 250px; max-height: 350px;">
               </a>
             </td>
           </tr>
@@ -35,7 +36,7 @@
 
             <th *ngIf="!datarow.IsHeader" scope="row">{{datarow.RowHeader}}</th>
 
-            <td class="attendee">
+            <td *ngIf="!datarow.IsHeader" class="attendee">
               <div *ngIf="datarow.IsList" class="plainlist">
                 <ul>
                   <li *ngFor="let lstdata of datarow.ListData">

@@ -124,7 +124,7 @@ export class ArticleService {
       return null;
     }
 
-    category.procedureName = "saveArticle";
+    category.procedureName = "saveCategory";
     var categoryJson = JSON.stringify(category);
 
     const httpOptions = {

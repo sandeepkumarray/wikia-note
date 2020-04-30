@@ -7,7 +7,7 @@
             <div class="col-sm-9">
                 <input class="form-control" [(ngModel)]="details.title" #title="ngModel" id="input-Title" name="title"
                     placeholder="Title" autofocus fullWidth fieldSize="large" [required]="true" [minlength]="3"
-                    [maxlength]="50" [attr.aria-invalid]="title.invalid && title.touched ? true : null">
+                    [maxlength]="100" [attr.aria-invalid]="title.invalid && title.touched ? true : null">
                 <ng-container *ngIf="title.invalid && title.touched">
                     <p class="text-danger" *ngIf="title.errors?.required">
                         Title is required!

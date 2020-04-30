@@ -59,6 +59,7 @@ export class ArticleViewComponent implements OnInit {
                 section.title = sec.title;
                 section.status = sec.status;
                 section.description = decodeURIComponent(sec.description);
+                section.description  =section.description.replace("[QUOTE]", '"');
                 this.article.sections.push(section)
               });
             }
@@ -68,7 +69,6 @@ export class ArticleViewComponent implements OnInit {
           .subscribe((data: any) => {
             let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(data.infocard);
 
-            console.log(infoGroupDetailList);
             if (infoGroupDetailList != null) {
 
               infoGroupDetailList.map(sec => {
@@ -131,9 +131,6 @@ export class ArticleViewComponent implements OnInit {
         });
       }
     });
-
-    console.log(this.infocardTable);
-
 
     // this.http.get(apiURL).pipe(
     //   map((res: any) => {return res }))

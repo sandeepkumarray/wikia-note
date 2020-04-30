@@ -95,6 +95,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $bannerimg = !empty($data->bannerimg) ? "'$data->bannerimg'" : "NULL";
         $sections = $data->sections;
         $infocard = $data->infocard;
+        $type = $data->type;
         
         $sql = "SELECT id FROM articles WHERE title = '$title'";
         
@@ -109,10 +110,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $response->message = "Article title $title is already taken.";
             }
             else {
-                $sql = "INSERT INTO articles(title, slug, user_id, category_id, description, summary, banner, status, is_featured, is_active, created_at) 
-				VALUES ('$title', '$slug', $userid, $categoryID, '$description', '$summary', $bannerimg, 1 , $isfeatured ,$isactive, sysdate())";
+                $sql = "INSERT INTO articles(title, slug, user_id, category_id, description, summary, banner, status, is_featured, is_active, type , created_at) 
+				VALUES ('$title', '$slug', $userid, '$categoryID', '$description', '$summary', $bannerimg, 1 , $isfeatured ,$isactive, $type, sysdate())";
 
-				 $log->info("article insert sql = $sql");
+				$log->info("article insert sql = $sql");
 				if($stmt = mysqli_prepare($link, $sql)){
 					if(mysqli_stmt_execute($stmt)){
                         
@@ -126,8 +127,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 						
 						foreach($sections as $key => $value) {
 							$sql = "INSERT INTO sections (title, content, article_id ) VALUES ";
-							
-							$sql .= "('".$value->title."','" .($value->description)."', $article_id)";
+                            $secTitle = "";
+                            $secContent = $value->description;
+
+							if(isset($value->title) || is_object($value->title))
+                            {
+                                $secTitle = $value->title;
+                            }
+							$sql .= '("'.$secTitle.'","' .($secContent).'", $article_id)';
                             
                             $log->info("Section insert sql = $sql");
 							mysqli_query( $link, $sql );  
@@ -234,13 +241,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $deletedSections = $data->deletedSections;
         $article_id = $data->id;
         $infocard = $data->infocard;
+        $type = $data->type;
 
         $sql="
         UPDATE articles SET 
         title='$title',
         slug='$slug',
         user_id=$userid,
-        category_id=$categoryID ,
+        category_id='$categoryID' ,
         description='$description',
         summary='$summary',
         banner=$bannerimg,
@@ -249,7 +257,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         is_active=$isactive
         WHERE id = $article_id";
 
-		//$log->info("update sql = $sql");
+		$log->info("update sql = $sql");
          
         if($stmt = mysqli_prepare($link, $sql)){
             if(mysqli_stmt_execute($stmt)){
@@ -264,8 +272,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     if(empty($value->id)){                        
                         $log->info("id is empty");
                         $sql = "INSERT INTO sections (title, content, article_id ) VALUES ";
-							
-                        $sql .= "('".$value->title."','" .($value->description)."', $article_id)";
+                        $secTitle = "";
+                        $secContent = $value->description;
+
+                        $log->info("Section insert title = $value->title");
+                        
+                        $log->info("isset =". isset($value->title));
+                        $log->info("is_object =". is_object($value->title));
+
+                        if(isset($value->title) || is_object($value->title))
+                        {
+                            $secTitle = $value->title;
+                        }
+
+                        $sql .= '("'.$secTitle.'","' .($secContent).'",'. $article_id.')';
+                        
                         
                         $log->info("Section insert sql = $sql");
                         mysqli_query( $link, $sql );
@@ -276,6 +297,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         content='" .$value->description."',
                         status=null
                         WHERE id = $value->id";
+
+                        $log->info("update section sql = $sql");
+
+                        $sql = 'UPDATE sections SET
+                        title="'.$value->title.'",
+                        content="'.$value->description.'",
+                        status=null
+                        WHERE id = '. $value->id;
                         
                         $log->info("update section sql = $sql");
              
@@ -326,7 +355,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         status=$status
         WHERE id = $id";
 
-		//$log->info("update sql = $sql");
+		$log->info("update sql = $sql");
          
         if($stmt = mysqli_prepare($link, $sql)){
             if(mysqli_stmt_execute($stmt)){
@@ -390,9 +419,15 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 		
 		$start_from = ($pageno-1) * $limit;  
 
-        $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured, slug, A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
-        inner join users U on A.user_id = U.id ORDER BY id ASC LIMIT $start_from,$limit";
+        $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, 
+        summary, banner, is_featured, slug, A.is_active, A.created_at 
+        FROM articles A 
+        inner join categories C on A.category_id = C.id
+        inner join users U on A.user_id = U.id 
+        WHERE type = 2
+        ORDER BY id ASC LIMIT $start_from,$limit";
         
+		$log->info("getAllArticles sql=.$sql");
         $result = mysqli_query( $link, $sql );  
         $row_cnt = $result->num_rows;
         
@@ -429,9 +464,10 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 
         $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured, slug, A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
         inner join users U on A.user_id = U.id 
-        WHERE title like '%$searchkey%' 
+        WHERE title like '%$searchkey%' and A.type = 2
         ORDER BY id ASC LIMIT $start_from,$limit";
         
+		$log->info("searchArticles sql=.$sql");
         $result = mysqli_query( $link, $sql );  
         $row_cnt = $result->num_rows;
         
@@ -463,7 +499,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 		$id = $_GET['id'];
 		        
         $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured, slug,  A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
-        inner join users U on A.user_id = U.id where A.id = $id";
+        inner join users U on A.user_id = U.id where A.id = $id and type = 2";
 
         $result = mysqli_query( $link, $sql );  
         $row_cnt = $result->num_rows;
@@ -493,7 +529,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
     if($procedureName == "getTop6FeaturedArticles")
     {        
         $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.category_name as category, description, summary, banner, is_featured,  slug,  A.is_active, A.created_at FROM articles A inner join categories C on A.category_id = C.id
-        inner join users U on A.user_id = U.id where A.is_featured = 1 and A.status = 2";
+        inner join users U on A.user_id = U.id where A.is_featured = 1 and A.status = 2 and A.type = 2";
 
         $result = mysqli_query( $link, $sql );  
         $row_cnt = $result->num_rows;
@@ -538,9 +574,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
     {
 		$Slug = $_GET['slug'];
 		        
-        $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user, C.id as category, description, summary, banner, is_featured, slug,  A.is_active, A.created_at 
+        $sql = "SELECT A.id, title, CONCAT(U.first_name ,' ',U.last_name) as user,  A.category_id as category, description, summary, banner, is_featured, slug,  A.is_active, A.created_at 
         FROM articles A 
-        inner join categories C on A.category_id = C.id
         inner join users U on A.user_id = U.id where A.Slug = '$Slug'";
 
 	    //$log->info("sql=.$sql");

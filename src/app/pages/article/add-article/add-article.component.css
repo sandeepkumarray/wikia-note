@@ -1,14 +1,16 @@
+@import '~@ng-select/ng-select/themes/default.theme.css';
+
 .imgcontainer {
     position: relative;
     width: 100%;
-    max-width: 50px;
+    max-width: 500px;
   }
   
   .imgcontainer img {
-    width: 50px; 
-    height: 50px;
-    min-width: 50px;
-    min-height: 50px;
+    width: 500px; 
+    height: 500px;
+    min-width: 500px;
+    min-height: 500px;
     border-width: 2px;   
     border-color: gray;   
     border-style: solid;
@@ -16,10 +18,10 @@
   
   .imgcontainer .btn {
     position: absolute;
-    top: -10%;
+    top: -3%;
     left: 100%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
+    transform: translate(-30%, -10%);
+    -ms-transform: translate(-30%, -10%);
     
     padding-left: 0px;
     padding-right: 0px;
@@ -45,3 +47,16 @@
     border-width: .2rem;
 }
 
+.ng-select {
+  line-height: 1.5;
+}
+
+.ng-dropdown-panel {
+  border-radius: 4px;
+
+}
+
+.ng-select-bottom.ng-select-top {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, .2), 0 4px 5px 0 rgba(0, 0, 0, .14),
+      0 1px 10px 0 rgba(0, 0, 0, .12);
+  }

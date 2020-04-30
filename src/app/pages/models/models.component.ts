@@ -6,11 +6,11 @@ export class ArticleItem {
   public id?: string;
   public title?: string;
   public user?: string;
-  public category?: string;
+  public category?: any[];
   public description?: string;
   public summary?: string;
   public bannerimg?: string;
-  public is_featured?: string;
+  public is_featured?: any;
   public is_active?: string;
   public isactive?: any;
   public created_at?: string;
@@ -44,6 +44,7 @@ export class DynamicArticleData {
   public status?: any;
   public sections: SectionItem[];
   public infocard: string;
+  public type: string;
   
   public deletedSections?: any[];
 }

@@ -22,6 +22,7 @@ import { DetailLinkComponent } from './add-article/detail-link/detail-link.compo
 import { AddInfocardGroupComponent } from './add-article/add-infocard-group/add-infocard-group.component';
 
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
     NgxSummernoteModule,
     UiSwitchModule,
     NgbAccordionModule,
+    NgSelectModule,
   ],
   providers: [
   ],

@@ -7,6 +7,36 @@ body {
 }
 
 body {
-    background: #007bff;
-    background: linear-gradient(to right, #0062E6, #33AEFF);
-  }
+  background-color: #002055;
+    background-image: radial-gradient(ellipse 50% 70% at 50% 0,#002c74 20%,#001536);
+}
+
+.tright, .floatright, table.floatright {
+  clear: right;
+  float: right;
+}
+.tright {
+  margin: 0.5em 0 1.3em 1.4em;
+}
+.thumb {
+  margin-bottom: 0.5em;
+  width: auto;
+  background-color: transparent;
+}
+.thumbinner {
+  border: 1px solid #c8ccd1;
+  padding: 3px;
+  background-color: #f8f9fa;
+  font-size: 94%;
+  text-align: center;
+  overflow: hidden;
+  width:222px;
+}
+
+.thumbinner {
+  min-width: 100px;
+}
+
+.thumbcaption {
+  text-align: left;
+}

@@ -3,7 +3,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { ToastService } from './services/toast.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ArticleInfiListComponent } from './pages/article/article-infi-list/article-infi-list.component';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { EventService } from './services/event.service';
 
 @Component({
@@ -30,6 +30,13 @@ export class AppComponent {
   constructor(private router: Router, public toastService: ToastService, public eventService: EventService) {
     this.bgIndex = Math.floor(Math.random() * this.bg_image_container.length);
     this.bg_image = "assets/images/" + this.bg_image_container[this.bgIndex];
+
+    this.router.events.subscribe((evt) => {
+      if (!(evt instanceof NavigationEnd)) {
+          return;
+      }
+      window.scrollTo(0, 0)
+  });
   }
 
   searchKeydown(event) {

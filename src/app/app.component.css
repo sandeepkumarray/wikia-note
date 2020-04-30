@@ -55,6 +55,6 @@ body {
 /* Other Classes for Page Styling */
 
 body {
-  background: #007bff;
-  background: linear-gradient(to right, #0062E6, #33AEFF);
+  background-color: #002055;
+    background-image: radial-gradient(ellipse 50% 70% at 50% 0,#002c74 20%,#001536);
 }
