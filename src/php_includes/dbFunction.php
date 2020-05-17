@@ -134,7 +134,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             {
                                 $secTitle = $value->title;
                             }
-							$sql .= '("'.$secTitle.'","' .($secContent).'", $article_id)';
+                            $sql .= '("'.$secTitle.'","' .($secContent).'",'. $article_id.')';
                             
                             $log->info("Section insert sql = $sql");
 							mysqli_query( $link, $sql );  
@@ -660,6 +660,39 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
             
                 $response->success = true;
                 $response->data = $row;
+                $response->message = "";
+                $result->close();
+            }
+            else 
+            {            
+                $response->success = false;
+                $response->message = "No data available in table";
+            }
+        } 
+        else {            
+            $response->success = false;
+            $response->message = "Error: " . $sql . "<br>" . mysqli_error($link);
+        }
+    }
+    
+    if($procedureName == "getTemplatesByType")
+    {
+		$type = $_GET['type'];
+		        
+        $sql = "SELECT * FROM  articles where type = '$type'";
+
+	    //$log->info("sql=.$sql");
+        $result = mysqli_query( $link, $sql );  
+        $row_cnt = $result->num_rows;
+        
+        if ($result) { 
+            if($row_cnt > 0){
+                while($row = $result->fetch_array(MYSQLI_ASSOC)) {
+                    $myArray[] = $row;
+                }
+            
+                $response->success = true;
+                $response->data = $myArray;
                 $response->message = "";
                 $result->close();
             }

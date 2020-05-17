@@ -23,8 +23,10 @@ export class AddArticleComponent implements OnInit {
   @ViewChild('container', { static: true, read: ViewContainerRef }) container: ViewContainerRef;
   @ViewChild('infocontainer', { static: true, read: ViewContainerRef }) infocontainer: ViewContainerRef;
 
+  header: any = "Add Article";
   isTemplate: boolean = false;
-  isOpenForEdt: boolean;
+  type: any = "2";
+  isOpenForEdt: boolean = false;
   IdealIMGWidth = 564;
   IdealIMGHeight = 700;
   slug: any;
@@ -34,20 +36,28 @@ export class AddArticleComponent implements OnInit {
   addSectionComponentClass = AddSectionComponent;
   addInfocardGroupComponent = AddInfocardGroupComponent;
 
-  public addTagNowRef: (name)=>void;
+  public addTagNowRef: (name) => void;
 
   constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, public toastService: ToastService, private modalService: ModalService,
     private router: Router, private componentFactoryResolver: ComponentFactoryResolver) {
     this.slug = this.activatedRoute.snapshot.paramMap.get('slug');
 
     if (this.slug != null) {
-      this.getArticleBySlug(this.slug);
-      this.getArticleSectionsBySlug(this.slug);
-      this.getArticleInfoCardBySlug(this.slug);
       this.isOpenForEdt = true;
+      this.header = "Edit Article";
+      this.loadArticleDetails(this.slug);
     }
+
     if (this.router.url.includes('/article/add-template')) {
+      this.header = "Add Template";
       this.isTemplate = true;
+      this.type = "1";
+    }
+
+    if (this.router.url.includes('/article/add-section-template')) {
+      this.header = "Add Section Template";
+      this.isTemplate = true;
+      this.type = "3";
     }
 
     this.addTagNowRef = (name) => this.addNewCategory(name);
@@ -73,12 +83,18 @@ export class AddArticleComponent implements OnInit {
   deletedSections: any[] = [];
   infoGroupDetailModalList: InfoGroupDetailModal[] = [];
 
+  templateList: ArticleItem[];
+  sectionTemplateList: ArticleItem[];
+
+  selectedTemplate: any;
 
   ngOnInit() {
     this.articleService.getAllCategory().subscribe(result => {
       this.categories = [];
       this.categories = this.categories.concat(result);
     });
+
+    this.getArticleTemplatesList();
   }
 
 
@@ -159,6 +175,8 @@ export class AddArticleComponent implements OnInit {
 
   saveAsDraft() {
     this.saveAsDraftMethod();
+    console.log(this.isOpenForEdt);
+    console.log(this.article);
 
     var response = new ResponseModel();
 
@@ -263,13 +281,15 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.isfeatured = this.article.is_featured ? 1 : 0;
       this.dynamicArticle.userid = 1;
       this.dynamicArticle.sections = sections;
-      this.dynamicArticle.infocard = infoCardString;
+
+      this.dynamicArticle.infocard = (infoCardString);
+      this.dynamicArticle.infocard = this.dynamicArticle.infocard.replace("'", "[QUOTE]");
+
       this.dynamicArticle.slug = this.dynamicArticle.title.split(" ").join("_");
 
-      if (this.isTemplate)
-        this.dynamicArticle.type = "1";
-      else
-        this.dynamicArticle.type = "2";
+      this.dynamicArticle.type = this.type;
+      console.log("this.dynamicArticle.infocard="+this.dynamicArticle.infocard);
+
 
       var response = new ResponseModel();
 
@@ -343,6 +363,21 @@ export class AddArticleComponent implements OnInit {
     else {
       this.router.navigate(['/article/articles']);
     }
+  }
+
+  loadArticleDetails(slug: string) {
+
+    this.info_components.forEach(comp => {
+      comp.component.instance._ref.destroy();
+    });
+
+    this.components.forEach(comp => {
+      comp.component.instance._ref.destroy();
+    });
+
+    this.getArticleBySlug(slug);
+    this.getArticleSectionsBySlug(slug);
+    this.getArticleInfoCardBySlug(slug);
   }
 
   getArticleBySlug(slug: string) {
@@ -424,7 +459,10 @@ export class AddArticleComponent implements OnInit {
   getArticleInfoCardBySlug(slug: string) {
     this.articleService.getArticleInfoCardBySlug(slug)
       .subscribe((data: any) => {
-        let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(data.infocard);
+        console.log("return info data "+data);
+        
+        let infocard = data.infocard.replace("[QUOTE]", "'");
+        let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(infocard);
         if (infoGroupDetailList != null) {
           infoGroupDetailList.map(sec => {
             this.addInfoCardComponent(this.addInfocardGroupComponent, sec);
@@ -489,5 +527,21 @@ export class AddArticleComponent implements OnInit {
       this.loading = false;
     }, 1000);
 
+  }
+
+  getArticleTemplatesList() {
+    this.articleService.getArticleTemplatesList().subscribe(result => {
+      this.templateList = [];
+      this.templateList = this.templateList.concat(result);
+    });
+  }
+
+  public onTemplateSelected(event) {
+    const value = event.target.value;
+
+    console.log(value);
+    console.log("selectedTemplate = " + this.selectedTemplate);
+
+    this.loadArticleDetails(this.selectedTemplate);
   }
 }

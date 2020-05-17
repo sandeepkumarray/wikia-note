@@ -25,10 +25,11 @@
           <tr>
             <td colspan="2" style="text-align:center">
               <a class="image">
-                <img alt="" [src]="article.bannerimg" decoding="async" style="max-width: 250px; max-height: 350px;">
+                <img alt=""
+                [src]="article.bannerimg" decoding="async" style="max-width: 250px; max-height: 350px;">
               </a>
             </td>
-          </tr>
+          </tr>          
           <tr *ngFor="let datarow of infocardTable">
             <th *ngIf="datarow.IsHeader" colspan="2" class="summary"
               style="text-align:center;background: #CCCCFF; padding: 0.25em 1em; line-height: 1.5em;">

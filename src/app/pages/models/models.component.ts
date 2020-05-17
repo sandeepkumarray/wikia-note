@@ -51,7 +51,7 @@ export class DynamicArticleData {
 
 export class SectionItem {
   public id: number;
-  public title?: string;
+  public title?: string = "";
   public description: string;
   public status: number;
 }

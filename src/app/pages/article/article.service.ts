@@ -202,4 +202,29 @@ export class ArticleService {
     return this.http.get<any>(apiURL);
 
   }
+
+  getArticleTemplatesList(): Observable<ArticleItem[]>{
+    let apiURL = `${environment.serverUrl}?procedureName=getTemplatesByType&type=1`;
+    if (isDevMode()) {
+
+    }
+    return this.http.get<ArticleItem[]>(apiURL);
+  }
+
+
+  getSectionTemplatesList(): Observable<ArticleItem[]>{
+    let apiURL = `${environment.serverUrl}?procedureName=getTemplatesByType&type=3`;
+    if (isDevMode()) {
+
+    }
+    return this.http.get<ArticleItem[]>(apiURL);
+  }
+
+  getSectionTemplateFromSlug(slug:string){
+    let apiURL = `${environment.serverUrl}?procedureName=getArticleSectionsBySlug&slug=` + slug;
+    if (isDevMode()) {
+
+    }
+    return this.http.get<SectionItem>(apiURL);
+  }
 }

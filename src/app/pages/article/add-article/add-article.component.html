@@ -3,7 +3,24 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3>Add Article</h3>
+                    <div class="form-group row">
+                        <label class="label col-sm-6 col-form-label" for="input-category">
+                            <h3>{{header}}</h3>
+                        </label>
+
+                        <label *ngIf="type == 2 && isOpenForEdt == false" class="label col-sm-2 col-form-label" for="input-category">
+                            <h5>Select Template</h5>
+                        </label>
+                        <div class="col-sm-4" *ngIf="type == 2 && isOpenForEdt == false">
+                            <select class="form-control" selected="0" [(ngModel)]="selectedTemplate" #template="ngModel"
+                                id="select-template" name="template" placeholder="Select Template" fullWidth
+                                (change)='onTemplateSelected($event)'
+                                fieldSize="large">
+                                <option *ngFor="let c of templateList" [value]="c.slug">{{c.title}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div>

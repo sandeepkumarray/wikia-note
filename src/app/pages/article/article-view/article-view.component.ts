@@ -67,7 +67,9 @@ export class ArticleViewComponent implements OnInit {
 
         this.articleService.getArticleInfoCardBySlug(slug)
           .subscribe((data: any) => {
-            let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(data.infocard);
+
+            let infocard = data.infocard.replace("[QUOTE]", "'");
+            let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(infocard);
 
             if (infoGroupDetailList != null) {
 

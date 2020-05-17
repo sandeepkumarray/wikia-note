@@ -27,6 +27,7 @@ export class AddInfocardGroupComponent implements OnInit {
   _id: number;
 
   ngOnInit() {
+    this.accordionHideShow();
   }
 
   addComponent(componentClass: Type<AddInfocardModalComponent>) {

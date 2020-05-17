@@ -25,6 +25,7 @@ export class AddInfocardModalComponent implements OnInit {
   @Output() passDeleteEntry: EventEmitter<any> = new EventEmitter();
 
   ngOnInit() {
+    this.accordionHideShow();
   }
 
   addComponent(componentClass: Type<DetailLinkComponent>) {

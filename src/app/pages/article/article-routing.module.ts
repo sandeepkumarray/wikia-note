@@ -28,6 +28,11 @@ const routes: Routes = [{
         component: AddArticleComponent,
       },
       {
+        path: 'add-section-template',
+        component: AddArticleComponent,
+
+      },
+      {
         path: 'article-view/:slug',
         component: ArticleViewComponent,
       },
