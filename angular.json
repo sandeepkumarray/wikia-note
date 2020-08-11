@@ -30,7 +30,7 @@
               "src/web.config"
             ],
             "styles": [
-              "src/styles.css",              
+              "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/summernote/dist/cerulean/summernote-lite-cerulean.css",
@@ -38,9 +38,9 @@
               "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.theme.default.min.css"
             ],
             "scripts": [
-              
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/summernote/dist/summernote-lite.min.js"
+              "node_modules/summernote/dist/summernote-lite.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },
           "configurations": {
@@ -112,7 +112,7 @@
           "configurations": {
             "production": {
               "browserTarget": "wikia-note:build:production"
-            },            
+            },
             "uat": {
               "browserTarget": "wikia-note:build:uat"
             }
@@ -167,6 +167,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "wikia-note"
 }

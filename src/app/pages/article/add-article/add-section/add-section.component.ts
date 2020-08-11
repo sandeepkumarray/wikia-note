@@ -19,6 +19,7 @@ export class AddSectionComponent implements OnInit {
 
   public ddtemplate: (context) => void;
   section: SectionItem = new SectionItem();
+  public data: SectionItem = new SectionItem();
 
   constructor(private articleService: ArticleService) {
     this.ddtemplate = this.dropdownTemplate;
@@ -73,7 +74,7 @@ export class AddSectionComponent implements OnInit {
         ],
       ]
     },
-    height: '200px',
+    height: '100%',
     uploadImagePath: '/api/upload',
     toolbar: [
       ['custom', ['templates']],

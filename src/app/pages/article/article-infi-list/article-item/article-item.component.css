@@ -1,0 +1,53 @@
+.color-status {
+    background-color: #6bbd49;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.color-status-Draft {
+    background-color: #f7d307;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.color-status-Published {
+    background-color: #6bbd49;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.color-status-Approved {
+    background-color: #00924e;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.color-status-Declined {
+    background-color: #ff0000;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.color-status-Rejected {
+    background-color: #cc0070;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}

@@ -24,6 +24,10 @@ const routes: Routes = [{
         component: AddArticleComponent,
       },
       {
+        path: 'add-article/:new_slug',
+        component: AddArticleComponent,
+      },
+      {
         path: 'add-template',
         component: AddArticleComponent,
       },

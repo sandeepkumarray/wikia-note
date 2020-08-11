@@ -26,6 +26,7 @@
     "jquery": "^3.4.1",
     "ngx-infinite-scroll": "^8.0.0",
     "ngx-owl-carousel-o": "^2.1.0",
+    "ngx-sortable": "^1.0.3",
     "ngx-summernote": "^0.7.6",
     "ngx-toggle-switch": "^2.0.5",
     "rxjs": "~6.4.0",

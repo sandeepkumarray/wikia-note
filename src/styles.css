@@ -40,3 +40,9 @@ body {
 .thumbcaption {
   text-align: left;
 }
+
+@media print {
+  .printPageButton {
+    display: none;
+  }
+}

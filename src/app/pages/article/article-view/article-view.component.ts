@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import { isDevMode } from '@angular/core';
@@ -6,10 +6,15 @@ import { HttpClient } from '@angular/common/http';
 import { delay, map, isEmpty } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
-import { ArticleItem, SectionItem, InfoGroupDetailModal, HtmlTableRowData, HtmlTableListData } from '../../models/models.component';
+import {
+  ArticleItem, ResponseModel, DynamicArticleData, SectionItem, InfoGroupDetailModal, toastStatus,
+  HtmlTableRowData, HtmlTableListData
+} from '../../models/models.component';
 import { ArticleService } from '../article.service';
 import { isUndefined } from 'util';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-article-view',
@@ -19,15 +24,26 @@ import { isUndefined } from 'util';
 
 export class ArticleViewComponent implements OnInit {
 
+  edit_Menu_Visible: boolean;
   @Input() article: ArticleItem;
   slug: any;
+
+  @ViewChild('pdfsection', { static: true, read: ElementRef }) pdfsection: ElementRef;
 
   infocardTable: HtmlTableRowData[] = [];
 
   constructor(private articleService: ArticleService, private activatedRoute: ActivatedRoute,
-    private http: HttpClient, private router: Router) {
+    private http: HttpClient, private router: Router, private modalService: ModalService, private titleService: Title) {
     this.article = new ArticleItem();
     this.slug = this.activatedRoute.snapshot.paramMap.get('slug');
+    let pageTitle = this.slug;
+    do {
+      pageTitle = pageTitle.replace("_", ' ');
+    } while (pageTitle.includes("_"))
+
+    this.titleService.setTitle(pageTitle + " - Wikia Note");
+
+    this.edit_Menu_Visible = true;
   }
 
   ngOnInit() {
@@ -59,8 +75,8 @@ export class ArticleViewComponent implements OnInit {
                 section.title = sec.title;
                 section.status = sec.status;
                 section.description = decodeURIComponent(sec.description);
-                section.description  =section.description.replace("[QUOTE]", '"');
-                this.article.sections.push(section)
+                section.description = section.description.replace("[QUOTE]", '"');
+                this.article.sections.push(section);
               });
             }
           });
@@ -113,6 +129,7 @@ export class ArticleViewComponent implements OnInit {
           });
       }
       else {
+        this.edit_Menu_Visible = false;
         this.articleService.getArticleBySlug("Not_Found").subscribe((data: any) => {
           this.article.id = "0";
           this.article.title = slug;
@@ -155,6 +172,78 @@ export class ArticleViewComponent implements OnInit {
 
   editArticle(slug: string) {
     this.router.navigate(['/article/edit-article/', slug]);
+  }
+
+  approveArticle(article: ArticleItem) {
+    let dynamicArticle = new DynamicArticleData();
+    dynamicArticle.slug = article.slug;
+    dynamicArticle.id = article.id;
+
+    dynamicArticle.status = 2;
+
+    var response = new ResponseModel();
+    this.articleService.updateArticleStatus(dynamicArticle).subscribe(res => {
+      response = res;
+      if (response != null) {
+        if (response.success) {
+          this.modalService.openModal(toastStatus.success, "Post Article", "Article is published.");
+          this.router.navigate(['/articles/', dynamicArticle.slug]);
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Post Article", response.message);
+        }
+      }
+      else {
+        this.modalService.openModal(toastStatus.danger, "Post Article", "Error while publishing article.");
+      }
+    });
+  }
+
+  rejectArticle(article: ArticleItem) {
+    let dynamicArticle = new DynamicArticleData();
+    dynamicArticle.slug = article.slug;
+    dynamicArticle.id = article.id;
+
+    dynamicArticle.status = 5;
+
+    var response = new ResponseModel();
+    this.articleService.updateArticleStatus(dynamicArticle).subscribe(res => {
+      response = res;
+      if (response != null) {
+        if (response.success) {
+          this.modalService.openModal(toastStatus.success, "Reject Article", "Article is Rejected.");
+          this.router.navigate(['/articles/', dynamicArticle.slug]);
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Reject Article", response.message);
+        }
+      }
+      else {
+        this.modalService.openModal(toastStatus.danger, "Reject Article", "Error while rejecting article.");
+      }
+    });
+  }
+
+  deleteArticle(slug: string) {
+    let dynamicArticle = new DynamicArticleData();
+    dynamicArticle.slug = slug;
+
+    var response = new ResponseModel();
+    this.articleService.deleteArticle(dynamicArticle).subscribe(res => {
+      response = res;
+      if (response != null) {
+        if (response.success) {
+          this.modalService.openModal(toastStatus.success, "Articles", response.message);
+          this.router.navigate(['/article/articles/']);
+        }
+        else {
+          this.modalService.openModal(toastStatus.danger, "Articles", response.message);
+        }
+      }
+      else {
+        this.modalService.openModal(toastStatus.danger, "Articles", "Error while deleting article.");
+      }
+    });
   }
 
 }

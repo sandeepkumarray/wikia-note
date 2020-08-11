@@ -10,6 +10,9 @@ import {
   ModalDetails, DetailsLink, InfoDetailModal, InfoGroupDetailModal
 } from '../../models/models.component';
 import { AddInfocardGroupComponent } from './add-infocard-group/add-infocard-group.component';
+import { Subscription } from 'rxjs';
+import { isUndefined } from 'util';
+
 
 @Component({
   selector: 'app-add-article',
@@ -30,6 +33,7 @@ export class AddArticleComponent implements OnInit {
   IdealIMGWidth = 564;
   IdealIMGHeight = 700;
   slug: any;
+  new_slug: any;
   components: ComponentItem[] = [];
   info_components: ComponentItem[] = [];
 
@@ -38,14 +42,24 @@ export class AddArticleComponent implements OnInit {
 
   public addTagNowRef: (name) => void;
 
-  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService, public toastService: ToastService, private modalService: ModalService,
+  constructor(private activatedRoute: ActivatedRoute, private articleService: ArticleService,
+    public toastService: ToastService, private modalService: ModalService,
     private router: Router, private componentFactoryResolver: ComponentFactoryResolver) {
     this.slug = this.activatedRoute.snapshot.paramMap.get('slug');
+    this.new_slug = this.activatedRoute.snapshot.paramMap.get('new_slug');
 
     if (this.slug != null) {
       this.isOpenForEdt = true;
       this.header = "Edit Article";
       this.loadArticleDetails(this.slug);
+    }
+    else if (this.new_slug != null) {
+      this.article = new ArticleItem();
+      this.article.title = this.new_slug;
+
+      do {
+        this.article.title = this.article.title.replace("_", ' ');
+    } while ( this.article.title.includes("_") )
     }
 
     if (this.router.url.includes('/article/add-template')) {
@@ -97,6 +111,9 @@ export class AddArticleComponent implements OnInit {
     this.getArticleTemplatesList();
   }
 
+  ngOnDestroy() {
+    // destroy all the subscriptions at once
+  }
 
   onImageChange(event) {
     let image: any = event.target.files[0];
@@ -160,7 +177,7 @@ export class AddArticleComponent implements OnInit {
   onDelete(event) {
   }
 
-  addComponent(componentClass: Type<AddSectionComponent>) {
+  addSecComponent(componentClass: Type<AddSectionComponent>) {
     // Create component dynamically inside the ng-template
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentClass);
     const component = this.container.createComponent(componentFactory);
@@ -168,17 +185,33 @@ export class AddArticleComponent implements OnInit {
     // Push the component so that we can keep track of which components are created
     var compItem = new ComponentItem();
     compItem.component = component;
-    compItem.id = this.components.length + 1;
+    compItem.id = this.components.length == 0 ? 1 : Math.max.apply(Math, this.components.map(function (o) { return o.id; })) + 1;
+
     component.instance._ref = component;
+    let section: SectionItem = new SectionItem();
+    section.title = "New Section";
+    section.id = compItem.id;
+
+    component.instance.section = section;
+    this.allSections.push(component.instance.section);
     this.components.push(compItem);
+  }
+
+  addSectionTab() {
+    let section: SectionItem = new SectionItem();
+    section.title = "New Section";
+    section.id = this.allSections.length == 0 ? 1 : Math.max.apply(Math, this.allSections.map(function (o) { return o.id; })) + 1;
+    section.status = 1;
+    this.allSections.push(section);
+    console.log(this.allSections);
   }
 
   saveAsDraft() {
     this.saveAsDraftMethod();
-    console.log(this.isOpenForEdt);
-    console.log(this.article);
-
     var response = new ResponseModel();
+
+    console.log(this.dynamicArticle);
+
 
     if (!this.isOpenForEdt) {
       this.articleService.saveArticleAsDraft(this.dynamicArticle).subscribe(res => {
@@ -224,20 +257,28 @@ export class AddArticleComponent implements OnInit {
     let dup = [];
     let sections: SectionItem[] = [];
 
-    this.components.map(function (item) {
-      var existItem = res.find(x => x.component.instance.section.title == item.component.instance.section.title);
+    this.reorderSections();
+
+    this.allSections.map(function (item) {
+      var existItem = res.find(x => x.title == item.title);
       if (existItem) {
         dup.push(existItem);
       }
       else
         res.push(item);
-      sections.push(item.component.instance.section);
+      sections.push(item);
     });
 
     sections.forEach(sec => {
-      sec.description = sec.description.replace('"', "[QUOTE]");
-      sec.description = encodeURIComponent(sec.description);
+      if (!isUndefined(sec.description)) {
+        sec.description = sec.description.replace('"', "[QUOTE]");
+        sec.description = encodeURIComponent(sec.description);
+      }
+      else {
+        sec.description = "";
+      }
     });
+    console.log(sections);
 
     let infores = [];
     let infodup = [];
@@ -288,7 +329,7 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.slug = this.dynamicArticle.title.split(" ").join("_");
 
       this.dynamicArticle.type = this.type;
-      console.log("this.dynamicArticle.infocard="+this.dynamicArticle.infocard);
+      console.log("this.dynamicArticle.infocard=" + this.dynamicArticle.infocard);
 
 
       var response = new ResponseModel();
@@ -378,6 +419,9 @@ export class AddArticleComponent implements OnInit {
     this.getArticleBySlug(slug);
     this.getArticleSectionsBySlug(slug);
     this.getArticleInfoCardBySlug(slug);
+
+    console.log(this.allSections);
+
   }
 
   getArticleBySlug(slug: string) {
@@ -410,7 +454,8 @@ export class AddArticleComponent implements OnInit {
             section.status = sec.status;
             section.description = decodeURIComponent(sec.description);
             section.description = section.description.replace("[QUOTE]", '"');
-            this.addSectionComponent(this.addSectionComponentClass, section);
+            this.allSections.push(section);
+            //this.addSectionComponent(this.addSectionComponentClass, section);
           });
         }
       });
@@ -424,7 +469,8 @@ export class AddArticleComponent implements OnInit {
     // Push the component so that we can keep track of which components are created
     var compItem = new ComponentItem();
     compItem.component = component;
-    compItem.id = this.components.length + 1;
+    compItem.id = this.components.length == 0 ? 1 : Math.max.apply(Math, this.components.map(function (o) { return o.id; })) + 1;
+
     component.instance._ref = component;
     component.instance.section = section;
     component.instance.passDeleteEntry.subscribe((idEntry) => {
@@ -441,15 +487,14 @@ export class AddArticleComponent implements OnInit {
     // Push the component so that we can keep track of which components are created
     var compItem = new ComponentItem();
     compItem.component = component;
-    compItem.id = this.components.length == 0 ? 1 : Math.max.apply(Math, this.components.map(function (o) { return o.id; })) + 1;
+    compItem.id = this.info_components.length == 0 ? 1 : Math.max.apply(Math, this.info_components.map(function (o) { return o.id; })) + 1;
     component.instance._ref = component;
     component.instance._id = compItem.id;
 
-
     component.instance.passDeleteEntry.subscribe((idEntry) => {
-      const index: number = this.components.findIndex(item => item.id == idEntry);
+      const index: number = this.info_components.findIndex(item => item.id == idEntry);
       if (index !== -1) {
-        this.components.splice(index, 1);
+        this.info_components.splice(index, 1);
       }
     })
 
@@ -459,8 +504,8 @@ export class AddArticleComponent implements OnInit {
   getArticleInfoCardBySlug(slug: string) {
     this.articleService.getArticleInfoCardBySlug(slug)
       .subscribe((data: any) => {
-        console.log("return info data "+data);
-        
+        console.log("return info data " + data);
+
         let infocard = data.infocard.replace("[QUOTE]", "'");
         let infoGroupDetailList: InfoGroupDetailModal[] = JSON.parse(infocard);
         if (infoGroupDetailList != null) {
@@ -502,7 +547,6 @@ export class AddArticleComponent implements OnInit {
     setTimeout(() => {
       var response = new ResponseModel();
       let categoryItem: CategoryItem = new CategoryItem();
-      console.log(category_name);
 
       categoryItem.category_name = category_name;
       this.articleService.saveCategory(categoryItem).subscribe(res => {
@@ -538,10 +582,45 @@ export class AddArticleComponent implements OnInit {
 
   public onTemplateSelected(event) {
     const value = event.target.value;
-
-    console.log(value);
-    console.log("selectedTemplate = " + this.selectedTemplate);
-
     this.loadArticleDetails(this.selectedTemplate);
+  }
+
+  SectionsSorted(event) {
+    console.log(event);
+    this.allSections = event;
+  }
+
+  reorderSections() {
+    let index: number = 1;
+
+    this.allSections.forEach(sec => {
+      sec.sortorder = index++;
+    });
+  }
+
+  removeSection(id: any) {
+    const index: number = this.allSections.findIndex(item => item.id == id);
+    if (index !== -1) {
+      this.allSections.splice(index, 1);
+    }
+    this.deletedSections.push(id);
+
+    this.components.forEach(comp => {
+      comp.component.instance._ref.destroy();
+    });
+  }
+
+  SelectedSection(section: any) {
+
+    this.components.forEach(comp => {
+      comp.component.instance._ref.destroy();
+    });
+    this.addSectionComponent(this.addSectionComponentClass, section);
+  }
+
+  listStyle = {
+    height: '600px',
+    width: '100%',
+    dropZoneHeight: '100px'
   }
 }

@@ -8,14 +8,14 @@
                             <h3>{{header}}</h3>
                         </label>
 
-                        <label *ngIf="type == 2 && isOpenForEdt == false" class="label col-sm-2 col-form-label" for="input-category">
+                        <label *ngIf="type == 2 && isOpenForEdt == false" class="label col-sm-2 col-form-label"
+                            for="input-category">
                             <h5>Select Template</h5>
                         </label>
                         <div class="col-sm-4" *ngIf="type == 2 && isOpenForEdt == false">
                             <select class="form-control" selected="0" [(ngModel)]="selectedTemplate" #template="ngModel"
                                 id="select-template" name="template" placeholder="Select Template" fullWidth
-                                (change)='onTemplateSelected($event)'
-                                fieldSize="large">
+                                (change)='onTemplateSelected($event)' fieldSize="large">
                                 <option *ngFor="let c of templateList" [value]="c.slug">{{c.title}}
                                 </option>
                             </select>
@@ -94,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="imgcontainer">
+                                        <div class="imgcontainer" *ngIf="bannerImage">
                                             <img src="" #imgBanner [src]="bannerImage" alt="" class="img"
                                                 (load)="onImageLoad($event)">
                                             <a (click)="bannerImage=''" class="btn text-primary"><i
@@ -193,7 +193,7 @@
                                 </label>
                                 <div class="col-sm-4">
                                     <div class="mt-2">
-                                        <a (click)="addComponent(addSectionComponentClass)" class="text-primary"
+                                        <a (click)="addSectionTab()" class="text-primary"
                                             style="height: 0.1px;width: 30px;">
                                             <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></a>
                                     </div>
@@ -201,12 +201,35 @@
 
                             </div>
 
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <!-- Use ng-template to ensure that the generated components end up in the right place -->
+                            <div class="form-group row bd-div">
+                                <div class="col-sm-3">
+                                    <ngx-sortable [items]="allSections" [name]="'Sections'"
+                                        style="background-color: #CCCCFF;" [listStyle]="listStyle" (listSorted)="SectionsSorted($event)">
+                                        <ng-template let-item>
+                                            <div class="sortable-list-item" (click)="SelectedSection(item)">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        {{item.title}}
+                                                    </div>
+                                                    <div class="col-md-2 offset-md-2">
+                                                        <a (click)="removeSection(item.id)"
+                                                            style="float: right;cursor: default;" class="text-danger">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </ngx-sortable>
+                                </div>
+                                <div class="col-md-9">
+                                    
                                     <ng-template #container>
 
                                     </ng-template>
+                                </div>
+                                <div class="col-md-12">
+                                    <!-- Use ng-template to ensure that the generated components end up in the right place -->
+
                                 </div>
                             </div>
 

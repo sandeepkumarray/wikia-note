@@ -13,12 +13,13 @@ import { HomeModule } from './pages/home/home.module';
 import { MiscellaneousModule } from './pages/miscellaneous/miscellaneous.module';
 import { ArticleModule } from './pages/article/article.module';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTab, NgbTabset  } from '@ng-bootstrap/ng-bootstrap';
 import { ToastComponent } from './pages/theme/toast/toast.component';
 import { ModalComponent } from './pages/theme/modal/modal.component';
 import { ModelsComponent } from './pages/models/models.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DetailLinkComponent } from './pages/article/add-article/detail-link/detail-link.component';
+import { NgxSortableModule } from 'ngx-sortable';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { DetailLinkComponent } from './pages/article/add-article/detail-link/det
     NgbModule,
     FormsModule,
     ReactiveFormsModule,
+    NgxSortableModule,
   ],
   providers: [],
   entryComponents: [ModalComponent ],

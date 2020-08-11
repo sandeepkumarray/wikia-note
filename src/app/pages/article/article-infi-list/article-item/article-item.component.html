@@ -1,9 +1,10 @@
 <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">{{article.title}}</h5>
-      <div class="card-text" [innerHTML]="article.summary"></div>
-      <div>
-        <a (click)="gotoDetails(article.slug)" style="color: #a16eff;">Read full...</a>
-      </div>
+  <div class="card-body">
+    <div class="color-status-{{article.status}}"></div>
+    <h5 class="card-title">{{article.title}}</h5>
+    <div class="card-text" [innerHTML]="article.summary"></div>
+    <div>
+      <a (click)="gotoDetails(article.slug)" style="color: #a16eff;">Read full...</a>
     </div>
   </div>
+</div>

@@ -21,8 +21,9 @@ import { AddInfocardModalComponent } from './add-article/add-infocard-modal/add-
 import { DetailLinkComponent } from './add-article/detail-link/detail-link.component';
 import { AddInfocardGroupComponent } from './add-article/add-infocard-group/add-infocard-group.component';
 
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbTabsetModule, NgbTab } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxSortableModule } from 'ngx-sortable';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     UiSwitchModule,
     NgbAccordionModule,
     NgSelectModule,
+    NgxSortableModule,
+    NgbTabsetModule,
   ],
   providers: [
   ],

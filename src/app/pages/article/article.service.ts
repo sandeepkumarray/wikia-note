@@ -211,7 +211,6 @@ export class ArticleService {
     return this.http.get<ArticleItem[]>(apiURL);
   }
 
-
   getSectionTemplatesList(): Observable<ArticleItem[]>{
     let apiURL = `${environment.serverUrl}?procedureName=getTemplatesByType&type=3`;
     if (isDevMode()) {
@@ -227,4 +226,26 @@ export class ArticleService {
     }
     return this.http.get<SectionItem>(apiURL);
   }
+  
+  deleteArticle(articleData: DynamicArticleData): Observable<ResponseModel> {
+
+    let apiURL = `${environment.serverUrl}`;
+
+    if (isDevMode()) {
+      return null;
+    }
+
+    articleData.procedureName = "deleteArticle";
+
+    var articleJson = JSON.stringify(articleData);
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      })
+    };
+
+    return this.http.post<ResponseModel>(apiURL, { data: articleJson }, httpOptions);
+  }
+
 }
