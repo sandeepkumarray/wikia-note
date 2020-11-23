@@ -53,6 +53,7 @@ export class SectionItem {
   public id: number;
   public title?: string = "";
   public description: string;
+  public enc_description: string;
   public status: number;
   public sortorder: number;
 }

@@ -75,7 +75,11 @@ export class ArticleViewComponent implements OnInit {
                 section.title = sec.title;
                 section.status = sec.status;
                 section.description = decodeURIComponent(sec.description);
-                section.description = section.description.replace("[QUOTE]", '"');
+                
+                do {
+                  section.description = section.description.replace("[QUOTE]", '"');
+                } while (section.description.includes("[QUOTE]"))
+
                 this.article.sections.push(section);
               });
             }

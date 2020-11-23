@@ -260,7 +260,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $log->info("id is empty");
                         $sql = "INSERT INTO sections (title, content, article_id, status, sortorder ) VALUES ";
                         $secTitle = "";
-                        $secContent = $value->description;
+                        $secContent = $value->enc_description;
 
                         $log->info("Section insert title = $value->title");
 
@@ -273,13 +273,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         $sql .= '("' . $secTitle . '","' . ($secContent) . '",' . $article_id . ', 2, ' . $value->sortorder . ')';
 
-
                         $log->info("Section insert sql = $sql");
-                        mysqli_query($link, $sql);
+                       
+                        if(!mysqli_query($link, $sql))
+                            $log->info("Error while inserting section." . mysqli_error($link));
+                            
                     } else {
                         $sql = "UPDATE sections SET
                         title='$value->title',
-                        content='" . $value->description . "',
+                        content='" . $value->enc_description . "',
                         status = 2,
                         sortorder =  $value->sortorder
                         WHERE id = $value->id";
@@ -288,14 +290,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         $sql = 'UPDATE sections SET
                         title="' . $value->title . '",
-                        content="' . $value->description . '",
+                        content="' . $value->enc_description . '",
                         status = 2,                        
                         sortorder =  ' . $value->sortorder . '
                         WHERE id = ' . $value->id;
 
                         $log->info("update section sql 2= $sql");
 
-                        mysqli_query($link, $sql);
+                        if(!mysqli_query($link, $sql))
+                            $log->info("Error while inserting section." . mysqli_error($link));
                     }
                 }
 

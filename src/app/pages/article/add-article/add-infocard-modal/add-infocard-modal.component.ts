@@ -18,14 +18,13 @@ export class AddInfocardModalComponent implements OnInit {
 
   infoDetails: InfoDetailModal = new InfoDetailModal();
   components: ComponentItem[] = [];
-  accordIcon: string = "fa fa-chevron-up";
-  collapseClass: string = "collapse show";
+  InfocardaccordIcon: string = "fa fa-plus";
+  InfocardcollapseClass: string = "collapse show";
   _ref: any;
   _id: number;
   @Output() passDeleteEntry: EventEmitter<any> = new EventEmitter();
 
   ngOnInit() {
-    this.accordionHideShow();
   }
 
   addComponent(componentClass: Type<DetailLinkComponent>) {
@@ -75,14 +74,13 @@ export class AddInfocardModalComponent implements OnInit {
     this.passDeleteEntry.emit(this._id);
   }
 
-  accordionHideShow() {
-    if (this.accordIcon == "fa fa-chevron-down") {
-      this.accordIcon = "fa fa-chevron-up";
-      this.collapseClass = "collapse show";
+  InfocardaccordionHideShow() {
+
+    if (this.InfocardaccordIcon == "fa fa-plus") {
+      this.InfocardaccordIcon = "fa fa-minus";
     }
     else {
-      this.accordIcon = "fa fa-chevron-down";
-      this.collapseClass = "collapse";
+      this.InfocardaccordIcon = "fa fa-plus";
     }
 
   }

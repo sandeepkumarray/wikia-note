@@ -21,13 +21,13 @@ export class AddInfocardGroupComponent implements OnInit {
 
   components: ComponentItem[] = [];
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
-  accordIcon: string = "fa fa-chevron-up";
+  accordIcon: string = "fa fa-chevron-down";
   collapseClass: string = "collapse show";
   _ref: any;
   _id: number;
 
   ngOnInit() {
-    this.accordionHideShow();
+
   }
 
   addComponent(componentClass: Type<AddInfocardModalComponent>) {
@@ -59,13 +59,10 @@ export class AddInfocardGroupComponent implements OnInit {
   accordionHideShow() {
     if (this.accordIcon == "fa fa-chevron-down") {
       this.accordIcon = "fa fa-chevron-up";
-      this.collapseClass = "collapse show";
     }
     else {
       this.accordIcon = "fa fa-chevron-down";
-      this.collapseClass = "collapse";
     }
-
   }
 
   addInfocardComponent(componentClass: Type<AddInfocardModalComponent>, infoDetailModal: InfoDetailModal) {

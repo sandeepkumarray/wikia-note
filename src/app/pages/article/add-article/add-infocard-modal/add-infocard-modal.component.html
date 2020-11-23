@@ -1,11 +1,11 @@
-<div class="accordion" id="accordionExample">
+<div class="accordion" id="InfocardaccordionExample">
     <div class="card">
         <div class="card-header" id="headingOne" style="background-color: #CCCCFF;">
             <div class="row">
                 <div class="col-md-4">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
-                        (click)="accordionHideShow()">
-                        <i class="{{accordIcon}}"></i><label
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#InfocardcollapseOne"
+                        (click)="InfocardaccordionHideShow()">
+                        <i class="{{InfocardaccordIcon}}"></i><label
                             style="padding-left: 15px;">{{infoDetails.header}}</label></button>
                 </div>
                 <div class="col-md-2 offset-md-6">
@@ -14,7 +14,7 @@
                 </div>
             </div>
         </div>
-        <div id="collapseOne" class="{{collapseClass}}" aria-labelledby="headingOne" data-parent="#accordionExample">
+        <div id="InfocardcollapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#InfocardaccordionExample">
             <div class="card-body">
                 <div class="card">
                     <div class="card-header">

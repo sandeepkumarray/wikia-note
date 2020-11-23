@@ -59,7 +59,7 @@ export class AddArticleComponent implements OnInit {
 
       do {
         this.article.title = this.article.title.replace("_", ' ');
-    } while ( this.article.title.includes("_") )
+      } while (this.article.title.includes("_"))
     }
 
     if (this.router.url.includes('/article/add-template')) {
@@ -126,6 +126,9 @@ export class AddArticleComponent implements OnInit {
 
   saveArticle(form) {
     //save article to db
+    let saveArticleItem: ArticleItem;
+    saveArticleItem = Object.assign({}, this.article);
+
     this.article.categoryID = this.article.category;
     this.article.isactive = 1;
     this.article.isfeatured = this.article.is_featured ? 1 : 0;
@@ -133,7 +136,9 @@ export class AddArticleComponent implements OnInit {
 
     this.article.bannerimg = this.bannerImage;
     this.article.description = "";
+
     var response = new ResponseModel();
+
     this.articleService.saveArticle(this.article).subscribe(res => {
       response = res;
       if (response != null) {
@@ -203,15 +208,11 @@ export class AddArticleComponent implements OnInit {
     section.id = this.allSections.length == 0 ? 1 : Math.max.apply(Math, this.allSections.map(function (o) { return o.id; })) + 1;
     section.status = 1;
     this.allSections.push(section);
-    console.log(this.allSections);
   }
 
   saveAsDraft() {
     this.saveAsDraftMethod();
     var response = new ResponseModel();
-
-    console.log(this.dynamicArticle);
-
 
     if (!this.isOpenForEdt) {
       this.articleService.saveArticleAsDraft(this.dynamicArticle).subscribe(res => {
@@ -271,14 +272,17 @@ export class AddArticleComponent implements OnInit {
 
     sections.forEach(sec => {
       if (!isUndefined(sec.description)) {
-        sec.description = sec.description.replace('"', "[QUOTE]");
-        sec.description = encodeURIComponent(sec.description);
+        do {
+          sec.description = sec.description.replace('"', "[QUOTE]");
+        } while (sec.description.includes('"'))
+        console.log(sec.description);
+
+        sec.enc_description = encodeURIComponent(sec.description);
       }
       else {
-        sec.description = "";
+        sec.enc_description = "";
       }
     });
-    console.log(sections);
 
     let infores = [];
     let infodup = [];
@@ -313,8 +317,10 @@ export class AddArticleComponent implements OnInit {
       this.modalService.openModal(toastStatus.danger, "Save Article As Draft", "Duplicate section title found.");
     }
     else {
+      //this.dynamicArticle = Object.assign({}, this.article);
+
       this.dynamicArticle.title = this.article.title;
-      this.dynamicArticle.summary = this.article.summary;
+      this.dynamicArticle.summary = this.article.summary.replace("'", "`");
       this.dynamicArticle.description = this.article.description;
       this.dynamicArticle.bannerimg = this.bannerImage;
       this.dynamicArticle.categoryID = this.article.category.map(x => x).join(",");
@@ -329,7 +335,6 @@ export class AddArticleComponent implements OnInit {
       this.dynamicArticle.slug = this.dynamicArticle.title.split(" ").join("_");
 
       this.dynamicArticle.type = this.type;
-      console.log("this.dynamicArticle.infocard=" + this.dynamicArticle.infocard);
 
 
       var response = new ResponseModel();
@@ -452,8 +457,12 @@ export class AddArticleComponent implements OnInit {
             section.id = sec.id;
             section.title = sec.title;
             section.status = sec.status;
-            section.description = decodeURIComponent(sec.description);
-            section.description = section.description.replace("[QUOTE]", '"');
+            section.description = decodeURIComponent(sec.description);           
+
+            do {
+              section.description = section.description.replace("[QUOTE]", '"');
+            } while (section.description.includes("[QUOTE]"))
+
             this.allSections.push(section);
             //this.addSectionComponent(this.addSectionComponentClass, section);
           });
@@ -586,7 +595,7 @@ export class AddArticleComponent implements OnInit {
   }
 
   SectionsSorted(event) {
-    console.log(event);
+    //console.log(event);
     this.allSections = event;
   }
 

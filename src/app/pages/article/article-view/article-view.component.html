@@ -13,17 +13,20 @@
             <i class="fa fa-edit fa-lg" aria-hidden="true"></i>
           </a>
         </div>
-        <div class="printPageButton" *ngIf="edit_Menu_Visible" style="margin-left: initial;margin-right: 5px;color: #00924e;">
+        <div class="printPageButton" *ngIf="edit_Menu_Visible"
+          style="margin-left: initial;margin-right: 5px;color: #00924e;">
           <a (click)="approveArticle(article)" title="Approve">
             <i class="fa fa-check fa-lg" aria-hidden="true"></i>
           </a>
         </div>
-        <div class="printPageButton" *ngIf="edit_Menu_Visible" style="margin-left: initial;margin-right: 5px;color: #cc0070;">
+        <div class="printPageButton" *ngIf="edit_Menu_Visible"
+          style="margin-left: initial;margin-right: 5px;color: #cc0070;">
           <a (click)="rejectArticle(article)" title="Reject">
             <i class="fa fa-times fa-lg" aria-hidden="true"></i>
           </a>
         </div>
-        <div class="printPageButton" *ngIf="edit_Menu_Visible" style="margin-left: initial;margin-right: 5px;color: #ff0000;">
+        <div class="printPageButton" *ngIf="edit_Menu_Visible"
+          style="margin-left: initial;margin-right: 5px;color: #ff0000;">
           <a (click)="deleteArticle(article.slug)" title="Delete">
             <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
           </a>
@@ -34,38 +37,33 @@
       <table class="infobox vevent" style="width:22em">
         <tbody>
           <tr>
-            <th class="summary"
-              style="text-align:center;font-size:125%;font-weight:bold;font-style: italic; background: #CCCCFF; padding: 0.25em 1em; line-height: 1.5em; line-height: normal;">
+            <th colspan="2" class="summary" style="text-align:center;font-size:125%;font-weight:bold;font-style: italic; background: #CCCCFF; padding: 0.25em 1em; line-height: 1.5em; line-height: normal;">
               {{article.title}}</th>
           </tr>
           <tr>
-            <td style="text-align:center">
+            <td colspan="2" style="text-align:center">
               <a class="image">
                 <img id="editor" #editor alt="" [src]="article.bannerimg" decoding="async" style="max-width: 250px; max-height: 350px;">
-              </a>
-            </td>
+                </a>
+              </td>
           </tr>
           <tr *ngFor="let datarow of infocardTable">
-            <th *ngIf="datarow.IsHeader" class="summary"
-              style="text-align:center;background: #CCCCFF; padding: 0.25em 1em; line-height: 1.5em;">
-              {{datarow.TableData}}</th>
-
-            <th *ngIf="!datarow.IsHeader" scope="row">{{datarow.RowHeader}}</th>
-
-            <td *ngIf="!datarow.IsHeader" class="attendee">
-              <div *ngIf="datarow.IsList" class="plainlist">
-                <ul>
-                  <li *ngFor="let lstdata of datarow.ListData">
-                    <a *ngIf="lstdata.HasHyperLink" href="articles/{{lstdata.Data}}"
-                      title="lstdata.Data">{{lstdata.Data}}</a>
-                    <label *ngIf="!lstdata.HasHyperLink">{{lstdata.Data}}</label>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
+                 <th *ngIf="datarow.IsHeader" colspan="2" class="navbox-title" style="background: #CCCCFF;text-align:center">{{datarow.TableData}}</th>
+              <th *ngIf="!datarow.IsHeader" scope="row">{{datarow.RowHeader}}</th>
+              <td *ngIf="!datarow.IsHeader" class="attendee">
+                <div *ngIf="datarow.IsList" class="plainlist">
+                  <ul>
+                    <li *ngFor="let lstdata of datarow.ListData">
+                      <a *ngIf="lstdata.HasHyperLink" href="articles/{{lstdata.Data}}" title="lstdata.Data">{{lstdata.Data}}</a>
+                      <label *ngIf="!lstdata.HasHyperLink">{{lstdata.Data}}</label>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
         </tbody>
       </table>
+      <div>{{article.summary}}</div>
       <div *ngFor="let section of article.sections">
         <app-section-view [section]="section"></app-section-view>
       </div>
